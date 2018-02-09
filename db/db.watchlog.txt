@@ -1,0 +1,24 @@
+create database timewatch;
+use timewatch;
+
+CREATE TABLE `timewatch` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `projectName` varchar(100) NOT NULL COMMENT '项目名称',
+  `groupID` bigint(20) NOT NULL COMMENT '大分组 一般为Title.HashCode()',
+  `innerGroupID` bigint(20) NOT NULL DEFAULT '0' COMMENT '小分组  当前处理线程的唯一标识',
+  `logType` int(11) NOT NULL DEFAULT '0' COMMENT '  日志类型 0普通  1耗时  2错误',
+  `title` varchar(400) NOT NULL COMMENT '标题/概要',
+  `content` text COMMENT '详细',
+  `createTime` datetime NOT NULL COMMENT '程序创建时间',
+  `dbCreateTime` datetime NOT NULL COMMENT '插入数据库时时',
+  `elapsed` double NOT NULL COMMENT '耗时 秒',
+  `createTimeMs` int(11) NOT NULL COMMENT '创建时间毫秒数',
+  `addition` VARCHAR(255) NOT NULL DEFAULT '' COMMENT '',
+  PRIMARY KEY (`id`),
+  KEY `IX_timewatch_createTime` (`createTime`),
+  KEY `IX_timewatch_groupid` (`groupID`),
+  KEY `IX_timewatch_innergroupid` (`innerGroupID`),
+  KEY `IX_timewatch_logtype` (`logType`),
+  KEY `IX_timewatch_title` (`title`(255)),
+  KEY `IX_timewatch_groupid_title` (`groupID`,`title`(255))
+) ENGINE=InnoDB AUTO_INCREMENT=59 DEFAULT CHARSET=utf8
