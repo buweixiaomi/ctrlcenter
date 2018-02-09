@@ -1,0 +1,48 @@
+﻿@using ManageWeb
+@model ManageDomain.Models.OperationLog
+@{
+    ViewBag.Title = "操作日志详情";
+    Layout = "~/Views/Shared/_LayoutPageHome.cshtml";
+    ManageDomain.Models.OperationLog log = Model;
+    if (log == null)
+    {
+        log = new ManageDomain.Models.OperationLog();
+    }
+}
+
+<h2>查看操作日志</h2>
+<p>@Html.ActionLink("返回", "Index", null, new { @class = "btn btn-success" })</p>
+<div>
+    <form class="form-horizontal" role="form" method="post">
+        <div class="form-group">
+            <label for="Name" class="col-sm-2 control-label">标题</label>
+            <div class="col-sm-10">
+                @log.OperationTitle
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="SubName" class="col-sm-2 control-label">模块</label>
+            <div class="col-sm-10">
+                @log.Module
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="LoginName" class="col-sm-2 control-label">操作人</label>
+            <div class="col-sm-10">
+                @log.OperationName 
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="LoginName" class="col-sm-2 control-label">操作内容</label>
+            <div class="col-sm-10">
+             <div style="max-width:600px; word-break:break-all;">@log.OperationContent</div>
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="LoginName" class="col-sm-2 control-label">操作时间</label>
+            <div class="col-sm-10">
+                @log.Createtime  
+            </div>
+        </div>
+    </form>
+</div>

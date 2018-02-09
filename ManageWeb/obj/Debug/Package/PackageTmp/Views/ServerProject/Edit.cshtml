@@ -1,0 +1,266 @@
+﻿@using ManageWeb
+@model object
+
+@{
+    ViewBag.Title = (Model == null) ? "新增服务器项目" : "修改服务器项目";
+    Layout = "~/Views/Shared/_LayoutPageHome.cshtml";
+    var tmodel = Model as Tuple<ManageDomain.Models.ServerProject, ManageDomain.Models.Project, ManageDomain.Models.ServerMachine, List<ManageDomain.Models.ServerProjectConfig>>;
+    List<ManageDomain.Models.ServerProjectConfig> configs = new List<ManageDomain.Models.ServerProjectConfig>();
+    if (tmodel != null)
+    {
+        configs = tmodel.Item4;
+    }
+    ManageDomain.Models.ServerProject serverproject = null;
+    ManageDomain.Models.Project project = null;
+    ManageDomain.Models.ServerMachine server = null;
+    if (tmodel != null)
+    {
+        serverproject = tmodel.Item1;
+        project = tmodel.Item2;
+        server = tmodel.Item3;
+    }
+    if (serverproject == null)
+    {
+        serverproject = new ManageDomain.Models.ServerProject();
+    }
+}
+@section Head{
+    <script type="text/javascript">
+        ///<reference path="/scripts/jquery-1.9.1.js" />
+        ///<reference path="/scripts/main.js" />
+        function addconfig() {
+            var t = '             <tr>     <td> <input type="text" class="form-control" placeholder="请尽量只使用字母和下划线" name="configkey" value="" />  </td>   ' +
+                       '                 <td>   <input type="text" class="form-control" placeholder="" name="configvalue" value="" /> </td>   ' +
+                       '                 <td> <input type="text" class="form-control" placeholder="" name="configremark" value="" />   </td> ' +
+                       '                 <td> <button type="button" class="btn btn-danger" onclick="deleteconfig(this)">删除</button>  </td>  </tr>';
+            $("#p_proconfig tbody").append(t);
+        }
+        function deleteconfig(e) {
+            if (!confirm('你确定要删除吗(保存后删除生效)？'))
+                return;
+            $(e).parents('tr').remove();
+        }
+
+        function addtag() {
+            var t = '<tr>    <td>  <input type="text" class="form-control" placeholder="" name="tag" value=""> </td>' +
+                           '         <td>  <button type="button" class="btn btn-danger" onclick="deletetag(this)">删除</button>  </td> </tr>';
+            $("#tb_tag tbody").append(t);
+        }
+
+        function deletetag(e) {
+            if (!confirm('你确定要删除吗(保存后删除生效)？'))
+                return;
+            $(e).parents('tr').remove();
+        }
+
+    </script>
+}
+<h2>@ViewBag.Title @Html.ActionLink("返回", "Index", null, new { @class = "btn btn-primary" })</h2>
+<p></p>
+<div>
+    <form class="form-horizontal" role="form" method="post">
+        <div class="form-group">
+            <label for="ServerProjectId" class="col-sm-2 control-label">服务器项目ID</label>
+            <div class="col-sm-10">
+                @if (serverproject.ServerProjectId <= 0)
+                {
+                    <input type="text" class="form-control cc-width-4" name="ServerProjectId" id="ServerProjectId" placeholder="自动生成" readonly="readonly" value=""> }
+                else
+                {
+                    <input type="text" class="form-control cc-width-4" name="ServerProjectId" id="ServerProjectId" readonly="readonly" value="@(serverproject.ServerProjectId)">
+                }
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="title" class="col-sm-2 control-label">服务器项目别名</label>
+            <div class="col-sm-10">
+                <input type="text" class="form-control cc-width-4" name="title" id="title" placeholder="" value="@(serverproject.Title)">
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="codeName" class="col-sm-2 control-label">关连项目</label>
+            <div class="col-sm-10">
+                <input type="hidden" class="form-control" id="ProjectId" name="ProjectId" value="@(serverproject.ProjectId)">
+                @if (project != null)
+                {
+                    <span id="show_projectid" class="text-success">[@project.ProjectId"-"@project.Title]</span>
+                }
+                else
+                {
+                    <button type="button" class="btn btn-primary btn-sm" onclick="libserverproject.edit_selectproject()">选择项目</button><span id="show_projectid" class="text-success">请选择</span>
+                }
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="codeName" class="col-sm-2 control-label">关连服务器</label>
+            <div class="col-sm-10">
+                <input type="hidden" class="form-control" id="ServerId" name="ServerId" value="@(serverproject.ServerId)">
+                @if (server != null)
+                {
+                    <button type="button" onclick="libserverproject.edit_selectserver()" class="btn btn-primary">选择服务器</button>
+                    <span id="show_serverid" class="text-success">[@server.ServerId"-"@server.ServerName]</span>
+                }
+                else
+                {
+                    <button type="button" class="btn btn-primary btn-sm" onclick="libserverproject.edit_selectserver()">选择服务器</button>
+                    <span id="show_serverid" class="text-success">请选择</span>
+                }
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="State" class="col-sm-2 control-label">项目状态</label>
+            <div class="col-sm-10">
+                @Html.DropDownList("State", new List<SelectListItem>() {
+                new SelectListItem(){ Text = "正常" ,Value ="0", Selected = serverproject.State==0},
+                new SelectListItem(){ Text = "停用" ,Value ="1", Selected = serverproject.State==1}
+                }, new { @class = "form-control cc-width-2" })
+            </div>
+            @*new SelectListItem(){ Text = "删除" ,Value ="-1", Selected = model.State==-1}*@
+        </div>
+
+        <div class="form-group">
+            <label for="copyrightconfig" class="col-sm-2 control-label">版权配置</label>
+            <div class="col-sm-10">
+                <textarea class="form-control cc-width-6" rows="5" id="copyrightconfig" name="copyrightconfig">@(serverproject.CopyRightConfig)</textarea>
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="FunctionRemark" class="col-sm-2 control-label">功能说明</label>
+            <div class="col-sm-10">
+                <textarea class="form-control cc-width-6" rows="4" id="FunctionRemark" name="FunctionRemark">@(serverproject.FunctionRemark)</textarea>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="" class="col-sm-2 control-label">标签</label>
+            <div class="col-sm-10">
+                <div class="panel panel-default" style="max-width:400px;">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">
+                            <button type="button" class="btn btn-primary btn-sm" onclick="addtag()">增加标签</button>
+                        </h3>
+                    </div>
+                    <table class="table table-bordered" id="tb_tag">
+                        <tbody>
+                            @foreach (var a in ManageDomain.Pub.SplitTags(serverproject.Tag))
+                            {
+                                <tr>
+                                    <td>
+                                        <input type="text" class="form-control" placeholder="" name="tag" value="@a">
+                                    </td>
+                                    <td>
+                                        <button type="button" class="btn btn-danger" onclick="deletetag(this)">删除</button>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="form-group">
+            <label for="" class="col-sm-2 control-label">项目配置</label>
+            <div class="col-sm-10">
+                <div class="panel panel-default" style="max-width:800px;">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">
+                            <button type="button" class="btn btn-primary btn-sm" onclick="addconfig()">增加配置</button>
+                        </h3>
+                    </div>
+                    <table class="table table-bordered" id="p_proconfig">
+                        <thead>
+                            <tr>
+                                <th>参数代码</th>
+                                <th>默认值</th>
+                                <th>备注</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var a in configs)
+                            {
+                                <tr>
+                                    <td>
+                                        <input type="text" class="form-control" placeholder="请尽量只使用字母和下划线" name="configkey" value="@a.ConfigKey">
+                                    </td>
+                                    <td>
+                                        <input type="text" class="form-control" placeholder="" name="configvalue" value="@a.ConfigValue">
+                                    </td>
+                                    <td>
+                                        <input type="text" class="form-control" placeholder="" name="configremark" value="@a.Remark">
+                                    </td>
+                                    <td>
+                                        <button type="button" class="btn btn-danger" onclick="deleteconfig(this)">删除</button>
+                                        @if (a.CanDelete == 1)
+                                        {
+                                        }
+                                        else
+                                        {
+                                            <span class="label label-info">项目配置</span>
+                                        }
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="Remark" class="col-sm-2 control-label">备注</label>
+            <div class="col-sm-10">
+                <textarea class="form-control cc-width-6" rows="3" id="Remark" name="Remark">@(serverproject.Remark)</textarea>
+            </div>
+        </div>
+        @if (serverproject.ProjectId > 0)
+        {
+            <div class="form-group">
+                <label for="serverName" class="col-sm-2 control-label">创建时间</label>
+                <div class="col-sm-10">
+                    <span class="help-block">@Html.ToDateString(serverproject.CreateTime)</span>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="serverName" class="col-sm-2 control-label">更新时间</label>
+                <div class="col-sm-10">
+                    <span class="help-block">@Html.ToDateString(serverproject.UpdateTime)</span>
+                </div>
+            </div>
+        }
+        <div class="form-group">
+            <div class="col-sm-offset-2 col-sm-10">
+                @if (serverproject.ServerProjectId <= 0)
+                {
+                    <button type="submit" class="btn btn-primary">新增</button>}
+                else
+                {
+                    <button type="submit" class="btn btn-primary">保存</button>
+                }
+                <span class="label label-info">@ViewBag.msg</span>
+            </div>
+        </div>
+    </form>
+</div>
+
+
+<!-- 模态框（Modal） -->
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                <h4 class="modal-title" id="myModalLabel">模态框（Modal）标题</h4>
+            </div>
+            <div class="modal-body" id="m_value"></div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                <button type="button" class="btn btn-primary" onclick="setselectv()">提交更改</button>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div> 

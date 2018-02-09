@@ -1,0 +1,58 @@
+﻿@using Webdiyer.WebControls.Mvc
+@using ManageWeb
+@model ManageDomain.Models.PageModel<ManageDomain.Models.Project>
+@{
+}
+
+<table class="table table-bordered table-hover">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>名称</th>
+            <th>代码</th>
+            <th>状态</th>
+            <th>创建时间</th>
+            <th>修改时间</th>
+            <th>备注</th>
+            <th>操作</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var a in Model.list)
+        {
+            <tr>
+                <td>@a.ProjectId</td>
+                <td>@a.Title</td>
+                <td>@a.CodeName</td>
+                <td>
+                    @{
+            switch (a.State)
+            {
+                case 0:
+                    <span>正常</span>
+                    break;
+                case 1:
+                <span>停用</span>
+                    break;
+                case -1:
+                <span>已删除</span>
+                    break;
+            }
+                    }
+                </td>
+                <td>@Html.ToDateString(a.CreateTime)</td>
+                <td>@Html.ToDateString(a.UpdateTime)</td>
+                <td>@a.Remark</td>
+                <td>
+                    <div class="btn-group btn-group-sm">
+                        @Html.ActionLink("编辑", "Edit", new { projectId = a.ProjectId }, new { @class = "btn btn-default" })
+                        <button class="btn btn-danger" data-item="@a.ProjectId" onclick="deleteproject(this)">删除</button>
+                    </div>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+@Html.Pager(new Webdiyer.WebControls.Mvc.PagedList<ManageDomain.Models.Project>(Model.list, Model.PageNo, Model.PageSize, Model.TotalCount), new PagerOptions { PageIndexParameterName = "pno", NumericPagerItemCount = 5, ContainerTagName = "ul", CssClass = "pagination", CurrentPagerItemTemplate = "<li class=\"active\"><a href=\"#\">{0}</a></li>", DisabledPagerItemTemplate = "<li class=\"disabled\"><a>{0}</a></li>", PagerItemTemplate = "<li>{0}</li>", Id = "bootstrappager2", PageIndexBoxId = "pageIndexBox", GoToButtonId = "goToBtn" })
+
+

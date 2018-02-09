@@ -1,0 +1,143 @@
+﻿@using ManageDomain
+@using ManageWeb
+@model  ManageDomain.Models.Task
+@{
+    ViewBag.Title = "任务版本-[" + Model.TaskId + " " + Model.Title + "]";
+    Layout = "~/Views/Shared/_LayoutPageHome.cshtml";
+    var model = Model == null ? new ManageDomain.Models.Task() : Model;
+    List<ManageDomain.Models.TaskVersion> versions = new List<ManageDomain.Models.TaskVersion>();
+    if (ViewBag.versions != null)
+    {
+        versions = ViewBag.versions;
+    }
+}
+@section Head{
+    <script type="text/javascript">
+        function setversionid(e) {
+            var taskid = $(e).data("item");
+            var versionid = $(e).data("vesid");
+            $.ajax({
+                url: '/taskdll/Settaskversionid',
+                data: { taskid: taskid, versionid: versionid },
+                type: 'post',
+                success: function (data) {
+                    if (data.code > 0) {
+                        location.reload();
+                    }
+                    else {
+                        alert(data.msg);
+                    }
+                },
+                error: function () {
+                    alert("网络或服务器出错！");
+                }
+            });
+        }
+
+        function deletetask(e) {
+            if (confirm("确定要删除吗?")) {
+                var versionid = $(e).data("item");
+                $.ajax({
+                    url: '/taskdll/deletekversion',
+                    data: { versionid: versionid },
+                    type: 'post',
+                    success: function (data) {
+                        if (data.code > 0) {
+                            location.reload();
+                        }
+                        else {
+                            alert(data.msg);
+                        }
+                    },
+                    error: function () {
+                        alert("网络或服务器出错！");
+                    }
+                });
+            }
+        }
+    </script>
+}
+<h2>编辑任务信息</h2>
+<p>@Html.ActionLink("返回", "Index", null, new { @class = "btn btn-success" })</p>
+@if (model.TaskId > 0)
+{
+    <div class="btn-group">
+        @Html.ActionLink("编辑", "Edit", new { taskid = Request.QueryString["taskid"] }, new { @class = "btn btn-default " })
+        @Html.ActionLink("版本", "Version", new { taskid = Request.QueryString["taskid"] }, new { @class = "btn btn-default active" })
+    </div>
+}
+<div>
+    <table class="table table-bordered" style="width:1000px;">
+        <thead>
+            <tr>
+                <th>版本号</th>
+                <th>创建时间</th>
+                <th>下载地址</th>
+                <th>版本信息</th>
+                <th>备注</th>
+                <td>操作</td>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var a in versions)
+            {
+                <tr>
+                    <td>@a.VersionNo </td>
+                    <td>@Html.ToDateString(a.CreateTime)</td>
+                    <td>@a.DownloadUrl</td>
+                    <td>@a.VersionInfo</td>
+                    <td>@a.Remark</td>
+                    <td>
+                        <div class="btn-group btn-group-sm">
+                            @Html.Raw(Model.CurrVersionID == a.VersionId ? "<span class=\"label label-success\">当前版本</span>" : "")
+                            <button class="btn btn-default" data-item="@a.TaskId" data-vesid="@a.VersionId" onclick="setversionid(this)">设置为当前任务版本号</button>
+                            <button class="btn btn-danger" data-item="@a.VersionId" onclick="deletetask(this)">删除</button>
+                        </div>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+<div>
+    <form class="form-horizontal" role="form" method="post" enctype="multipart/form-data">
+        <div class="form-group">
+            <label for="VersionNo" class="col-sm-2 control-label">版本号</label>
+            <div class="col-sm-10">
+                <input type="text" class="form-control cc-width-4" id="VersionNo" name="VersionNo" placeholder="请输入版本号" value="">
+            </div>
+        </div>
+
+
+        <div class="form-group">
+            <label for="VersionInfo" class="col-sm-2 control-label">版本信息</label>
+            <div class="col-sm-10">
+                <input type="text" class="form-control cc-width-4" id="VersionInfo" name="VersionInfo" placeholder="" value="">
+            </div>
+        </div>
+
+
+        <div class="form-group">
+            <label for="Remark" class="col-sm-2 control-label">备注</label>
+            <div class="col-sm-10">
+                <input type="text" class="form-control cc-width-4" id="Remark" name="Remark" placeholder="" value="">
+            </div>
+        </div>
+
+
+        <div class="form-group">
+            <label for="downloadfile" class="col-sm-2 control-label">文件</label>
+            <div class="col-sm-10">
+                <input type="hidden" class="form-control" id="DownloadUrl" name="DownloadUrl" placeholder="" value="">
+                <input type="file" id="downloadfile" name="downloadfile" placeholder="" value="">
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="col-sm-offset-2 col-sm-10">
+                <button type="submit" class="btn btn-primary">保存</button>
+                <span class="label label-info">@ViewBag.msg</span>
+            </div>
+        </div>
+    </form>
+</div>

@@ -1,0 +1,36 @@
+﻿@{
+    ViewBag.Title = "资料";
+    Layout = "~/Views/Shared/_LayoutPageHome.cshtml";
+
+    ManageDomain.Models.Manager model = ViewBag.manager;
+}
+
+<h2>资料</h2> 
+<div class="panel panel-default cc-width-4">
+    <div class="panel-heading">
+        修改密码
+    </div>
+    <div class="panel-body">
+        <form method="post">
+            <p>
+                <label>原密码：</label>
+                <input type="password" class="form-control cc-width-2 cc-display-inline-block" name="oldpwd" />
+            </p>
+            <p>
+                <label>新密码：</label>
+                <input type="password" class="form-control cc-width-2 cc-display-inline-block" name="newpwd" />
+            </p>
+            <p>
+                <label>再一次：</label>
+                <input type="password" class="form-control cc-width-2 cc-display-inline-block" name="newpwd2" />
+            </p>
+            <div>
+                <p class="text-right">
+                    <button class="btn btn-primary">保存</button>
+                    <span class="text-warning">@ViewBag.msg</span>
+                </p>
+            </div>
+        </form>
+    </div>
+</div>
+

@@ -1,0 +1,58 @@
+﻿@{
+    string ty = ViewBag.type;
+}
+
+@if (ty == "server")
+{
+    List<ManageDomain.Models.ServerMachine> servers = ViewBag.model;
+    <ul class="list-group">
+        @foreach (var a in servers)
+        {
+            <li class="list-group-item" data-item="@a.ServerId" data-text="@a.ServerName">@a.ServerId @a.ServerName @a.ServerIPs</li>
+        }
+    </ul>
+}
+
+@if (ty == "customer")
+{
+    List<ManageDomain.Models.Customer> servers = ViewBag.model;
+    <ul class="list-group">
+        @foreach (var a in servers)
+        {
+            <li class="list-group-item" data-item="@a.CusId" data-text="@a.CustomerName">@a.CusId @a.CustomerName </li>
+        }
+    </ul>
+}
+
+@if (ty == "project")
+{
+    List<ManageDomain.Models.Project> servers = ViewBag.model;
+    <ul class="list-group">
+        @foreach (var a in servers)
+        {
+            <li class="list-group-item" data-item="@a.ProjectId" data-text="@a.Title">@a.ProjectId @a.Title (@a.CodeName)</li>
+        }
+    </ul>
+}
+
+@if (ty == "projectversion")
+{
+    List<ManageDomain.Models.ProjectVersion> servers = ViewBag.model;
+    <ul class="list-group">
+        @foreach (var a in servers)
+        {
+            <li class="list-group-item" data-item="@a.VersionId" data-text="@a.VersionNo">@a.VersionId @a.VersionNo</li>
+        }
+    </ul>
+}
+
+@if (ty == "manager")
+{
+    List<ManageDomain.Models.Manager> servers = ViewBag.model;
+    <ul class="list-group">
+        @foreach (var a in servers)
+        {
+            <li class="list-group-item" data-item="@a.ManagerId" data-text="@a.Name">@a.ManagerId @a.Name</li>
+        }
+    </ul>
+}

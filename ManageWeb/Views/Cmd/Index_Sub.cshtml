@@ -1,0 +1,89 @@
+﻿@using Webdiyer.WebControls.Mvc
+@model ManageDomain.Models.PageModel<Tuple<ManageDomain.Models.Command, ManageDomain.Models.ServerMachine>>
+@{
+}
+
+<table class="table table-bordered table-hover">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>名称</th>
+            <th>代码</th>
+            <th>分组</th>
+            <th>创建时间</th>
+            <th>取得时间</th>
+            <th>执行开始时间</th>
+            <th>执行结束时间</th>
+            <th>完成状态</th>
+            @*<th>结果信息</th>
+                <th>错误信息</th>*@
+            <th>操作</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var a in Model.list)
+        {
+            <tr>
+                <td>@a.Item1.CmdId</td>
+                <td>@a.Item1.Title</td>
+                <td>@a.Item1.CodeName</td>
+                <td>@a.Item1.GroupKey</td>
+                <td>@a.Item1.CreateTime.ToString("yyyy-MM-dd HH:mm:ss")</td>
+                <td>
+                    @if (a.Item1.GetTime != null)
+                    {
+                        <span>@a.Item1.GetTime.Value.ToString("yyyy-MM-dd HH:mm:ss")</span>
+                    }
+                </td>
+                <td>
+                    @if (a.Item1.PreExecuteTime != null)
+                    {
+                        <span>@a.Item1.PreExecuteTime.Value.ToString("yyyy-MM-dd HH:mm:ss")</span>
+                    }
+                </td>
+                <td>
+                    @if (a.Item1.CompleteTime != null)
+                    {
+                        <span>@a.Item1.CompleteTime.Value.ToString("yyyy-MM-dd HH:mm:ss")</span>
+                    }
+                </td>
+                <td>
+                    @{
+            if (a.Item1.CompleteState == 0)
+            {
+                <span>待执行...</span>
+            }
+            else if (a.Item1.CompleteState == 1)
+            {
+                <span>执行中</span>
+            }
+            else if (a.Item1.CompleteState == 2)
+            {
+                <span>成功</span>
+            }
+            else if (a.Item1.CompleteState == -1)
+            {
+                <span style="color:red;">执行失败</span>
+            }
+            else
+            {
+                <span>@a.Item1.CompleteState</span>
+            }
+                    }
+                </td>
+                @*<td>@a.Item1.CompleteMessage</td>
+                    <td>@a.Item1.CompleteError</td>*@
+                <td>
+                    <div class="btn-group btn-group-sm">
+                        @Html.ActionLink("详情", "Detail", new { cmdid = a.Item1.CmdId }, new { @class = "btn btn-default" })
+                        <button class="btn btn-danger" data-item="@a.Item1.CmdId" onclick="recommitcmd(this)">重新执行</button>
+                        <button class="btn btn-danger" data-item="@a.Item1.CmdId" onclick="deletecmd(this)">删除</button>
+                    </div>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+@Html.Pager(new Webdiyer.WebControls.Mvc.PagedList<object>(Model.list, Model.PageNo, Model.PageSize, Model.TotalCount), new PagerOptions { PageIndexParameterName = "pno", NumericPagerItemCount = 5, ContainerTagName = "ul", CssClass = "pagination", CurrentPagerItemTemplate = "<li class=\"active\"><a href=\"#\">{0}</a></li>", DisabledPagerItemTemplate = "<li class=\"disabled\"><a>{0}</a></li>", PagerItemTemplate = "<li>{0}</li>", Id = "bootstrappager2", PageIndexBoxId = "pageIndexBox", GoToButtonId = "goToBtn" })
+
+

@@ -1,0 +1,253 @@
+﻿@using ManageWeb
+@model ManageDomain.Models.WorkItem
+@{
+    ViewBag.Title = (Model == null) ? "新增工作任务" : "修改工作任务";
+    Layout = "~/Views/Shared/_LayoutPageHome.cshtml";
+    ManageDomain.Models.WorkItem wokeitem = Model;
+    if (wokeitem == null)
+    {
+        wokeitem = new ManageDomain.Models.WorkItem();
+    }
+    if (wokeitem.Difficulty < 1 || wokeitem.Difficulty > 5)
+    {
+        wokeitem.Difficulty = 3;
+    }
+
+    if (wokeitem.Importance < 1 || wokeitem.Importance > 5)
+    {
+        wokeitem.Importance = 3;
+    }
+}
+@section Head{
+    <script type="text/javascript">
+        ///<reference path="/scripts/jquery-1.9.1.js" />
+        ///<reference path="/scripts/main.js" />
+        ///<reference path="/Scripts/ckeditor/ckeditor.js" />
+        function addtag() {
+            var t = '<tr>    <td>  <input type="text" class="form-control" placeholder="" name="tag" value=""> </td>' +
+                           '         <td>  <button type="button" class="btn btn-danger" onclick="deletetag(this)">删除</button>  </td> </tr>';
+            $("#tb_tag tbody").append(t);
+        }
+
+        function deletetag(e) {
+            if (!confirm('你确定要删除吗(保存后删除生效)？'))
+                return;
+            $(e).parents('tr').remove();
+        }
+        $(document).ready(function () {
+            CKEDITOR.replace('Content', {
+                language: 'zh-cn'
+            });
+        });
+
+        function presubmit() {
+            var data = CKEDITOR.instances.Content.getData();
+            $("#HideContent").val(encodeURI(data));
+            return true;
+        }
+
+        function adduser() {
+            libjs.showselect('manager', function (ty, text, v) {
+                var us = [];
+                $("#distributeusers input").each(function () {
+                    us.push($(this).val());
+                });
+                var exist = false;
+                for (var i = 0; i < us.length; i++) {
+                    if (us[i] == v)
+                        exist = true;
+                }
+                if (!exist) {
+                    $("#distributeusers").append('<span onclick="removedistribute(this)"  class="label label-info">' + text + '<span class=" glyphicon glyphicon-remove"><span><input type="hidden" name="distributeuser" value="' + v + '" /></span></span></span>');
+                }
+            });
+        }
+
+        function removedistribute(e) {
+            if (!confirm("确定要删除分配吗？(保存后生效)")) {
+                return;
+            }
+            $(e).remove();
+        }
+    </script>
+}
+<h2>工作任务</h2>
+<p>@Html.ActionLink("返回", "Index", null, new { @class = "btn btn-success" })</p>
+<div>
+    <form class="form-horizontal" role="form" method="post">
+        <div class="form-group">
+            <label for="WorkItemId" class="col-sm-2 control-label">工作任务编号</label>
+            <div class="col-sm-10">
+                @if (wokeitem.WorkItemId <= 0)
+                {
+                    <input type="text" class="form-control cc-width-4" name="CusId" id="CusId" placeholder="自动生成" readonly="readonly" value=""> }
+                else
+                {
+                    <input type="text" class="form-control cc-width-4" name="WorkItemId" id="WorkItemId" readonly="readonly" value="@wokeitem.WorkItemId">
+                }
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="Title" class="col-sm-2 control-label">标题</label>
+            <div class="col-sm-10">
+                <textarea class="form-control cc-width-6" rows="2" id="Title" name="Title">@(wokeitem.Title)</textarea>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="Content" class="col-sm-2 control-label">内容描述</label>
+            <div class="col-sm-10">
+                <div class="cc-width-6">
+                    <textarea class="form-control cc-width-6" rows="2" id="Content">@Html.Raw(wokeitem.Content)</textarea>
+                    <textarea class="form-control cc-width-6" rows="2" id="HideContent" name="Content" style="display:none;">@Html.Raw(wokeitem.Content)</textarea>
+                </div>
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="Finaldate" class="col-sm-2 control-label">最后完成时间</label>
+            <div class="col-sm-10">
+                <input type="text" class="form-control cc-width-2 cc-display-inline-block" id="Finaldate" onclick="WdatePicker({ dateFmt: 'yyyy-MM-dd HH:mm:ss' })" name="Finaldate" value="@Html.ToDateString(wokeitem.Finaldate,"datetime")">
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="Difficulty" class="col-sm-2 control-label">难度</label>
+            <div class="col-sm-10">
+                @Html.DropDownList("Difficulty", new List<SelectListItem>() {
+                new SelectListItem(){ Text = "极简单" ,Value ="1", Selected = wokeitem.Difficulty==1},
+                new SelectListItem(){ Text = "较简单" ,Value ="2", Selected = wokeitem.Difficulty==2},
+                new SelectListItem(){ Text = "一般" ,Value ="3", Selected = wokeitem.Difficulty==3},
+                new SelectListItem(){ Text = "较难" ,Value ="4", Selected = wokeitem.Difficulty==4},
+                new SelectListItem(){ Text = "极难" ,Value ="5", Selected = wokeitem.Difficulty==5}
+                }, new { @class = "form-control  cc-width-2" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="Importance" class="col-sm-2 control-label">重要度</label>
+            <div class="col-sm-10">
+                @Html.DropDownList("Importance", new List<SelectListItem>() {
+                new SelectListItem(){ Text = "极底" ,Value ="1", Selected = wokeitem.Importance==1},
+                new SelectListItem(){ Text = "较底" ,Value ="2", Selected = wokeitem.Importance==2},
+                new SelectListItem(){ Text = "一般" ,Value ="3", Selected = wokeitem.Importance==3},
+                new SelectListItem(){ Text = "较高" ,Value ="4", Selected = wokeitem.Importance==4},
+                new SelectListItem(){ Text = "极高" ,Value ="5", Selected = wokeitem.Importance==5}
+                }, new { @class = "form-control  cc-width-2" })
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="EstimateTime" class="col-sm-2 control-label">预计用时</label>
+            <div class="col-sm-10">
+                <input type="text" class="form-control cc-width-2 cc-display-inline-block" id="EstimateTime" name="EstimateTime" value="@wokeitem.EstimateTime">
+                <span class="label label-info">小时</span>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="Point" class="col-sm-2 control-label">分值</label>
+            <div class="col-sm-10">
+                <input type="text" class="form-control cc-width-2 cc-display-inline-block" id="Point" name="Point" value="@wokeitem.Point">
+                <span class="help-block cc-display-inline-block">在0-100之间</span>
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="Point" class="col-sm-2 control-label">分配人员</label>
+            <div class="col-sm-10">
+                <span id="distributeusers">
+                    @if (wokeitem.Distributes != null)
+                    {
+                        foreach (var a in wokeitem.Distributes)
+                        {
+                            <span onclick="removedistribute(this)" class="label label-info">
+                                @a.ManagerName<span class=" glyphicon glyphicon-remove">
+                                    <span><input type="hidden" name="distributeuser" value="@a.ManagerId" /></span>
+                                </span>
+                            </span>
+                        }
+                    }
+                </span>
+                <button type="button" class="btn btn-primary glyphicon glyphicon-plus" onclick="adduser()">增加</button>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="" class="col-sm-2 control-label">标签</label>
+            <div class="col-sm-10">
+                <div class="panel panel-default" style="max-width:400px;">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">
+                            <button type="button" class="btn btn-primary" onclick="addtag()">增加标签</button>
+                        </h3>
+                    </div>
+                    <table class="table table-bordered" id="tb_tag">
+                        <tbody>
+                            @foreach (var a in ManageDomain.Pub.SplitTags(wokeitem.Tag))
+                            {
+                                <tr>
+                                    <td>
+                                        <input type="text" class="form-control" placeholder="" name="tag" value="@a">
+                                    </td>
+                                    <td>
+                                        <button type="button" class="btn btn-danger" onclick="deletetag(this)">删除</button>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="Remark" class="col-sm-2 control-label">备注</label>
+            <div class="col-sm-10">
+                <textarea class="form-control cc-width-6" rows="4" id="Remark" name="Remark">@(wokeitem.Remark)</textarea>
+            </div>
+        </div>
+        @if (wokeitem.WorkItemId > 0)
+        {
+            <div class="form-group">
+                <label for="serverName" class="col-sm-2 control-label">创建时间</label>
+                <div class="col-sm-10">
+                    <span class="help-block">@Html.ToDateString(wokeitem.CreateTime)</span>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="serverName" class="col-sm-2 control-label">创建人</label>
+                <div class="col-sm-10">
+                    <span class="help-block"> @wokeitem.ManagerName</span>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="serverName" class="col-sm-2 control-label">更新时间</label>
+                <div class="col-sm-10">
+                    <span class="help-block">@Html.ToDateString(wokeitem.UpdateTime)</span>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="serverName" class="col-sm-2 control-label">提交时间</label>
+                <div class="col-sm-10">
+                    <span class="help-block">@Html.ToDateString(wokeitem.CommitTime)</span>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="ActualTime" class="col-sm-2 control-label">实际用时</label>
+                <div class="col-sm-10">
+                    <span class="help-block">@(wokeitem.ActualTime)</span>
+                </div>
+            </div>
+        }
+        <div class="form-group">
+            <div class="col-sm-offset-2 col-sm-10">
+                @if (wokeitem.WorkItemId <= 0)
+                {
+                    <button type="submit" class="btn btn-primary" onclick="return presubmit()">新增</button>}
+                else
+                {
+                    <button type="submit" class="btn btn-primary" onclick="return presubmit()">保存</button>
+                }
+                <span class="label label-warning">@ViewBag.msg</span>
+            </div>
+        </div>
+    </form>
+</div>

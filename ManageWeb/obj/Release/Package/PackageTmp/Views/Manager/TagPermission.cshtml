@@ -1,0 +1,65 @@
+﻿@{
+    ViewBag.Title = "TagPermission";
+    List<ManageDomain.PermissionItem> tags = ViewBag.tagpermissions;
+    if (tags == null)
+    {
+        tags = new List<ManageDomain.PermissionItem>();
+    }
+
+}
+
+
+@{
+    @(Html.Raw("<ul class=\"list-group\">"))
+    List<int> count = new List<int>();
+    count.Add(tags.Count);
+    for (; count.Count > 0; )
+    {  
+            while (count[0] > 0)
+        {
+        var a = tags.First();
+    <li class="list-group-item" data-item="@a.Key">
+        @{
+            if (string.IsNullOrEmpty(a.Key))
+            { 
+                <p><span class="label label-info">@a.Name</span>@*<span> <input type="checkbox" />全选</span>*@</p>
+            }
+            else
+            {
+                <input name="permissionkey" class="permissionkey" data-key="@a.Key" type="checkbox" @if (a.HasPermission == 1) { @Html.Raw("checked=\"checked\"") } /> @a.Name
+            }
+        }
+        @{
+            tags.Remove(a);
+            count[0]--;
+            if (a.SubPermissions.Count > 0)
+            {
+                a.SubPermissions.Reverse();
+                foreach (var b in a.SubPermissions)
+                {
+                    tags.Insert(0, b);
+                }
+                count.Insert(0, a.SubPermissions.Count);
+                @(Html.Raw("<ul class=\"list-group\">")) 
+                break;
+            }
+        }
+    </li>
+        }
+            if (count[0] == 0)
+            {
+                count.RemoveAt(0);
+                if (count.Count > 0)
+                {
+                    @(Html.Raw("</ul>"))
+    @(Html.Raw("</li>"))
+                }
+            } 
+
+    }
+    @(Html.Raw("</ul>"))
+}
+
+
+
+

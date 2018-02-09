@@ -1,0 +1,94 @@
+﻿@using Webdiyer.WebControls.Mvc
+@using ManageWeb
+@model ManageDomain.Models.PageModel<ManageDomain.Models.ServerMachine>
+@{
+}
+
+<table class="table table-bordered table-hover">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>名称</th>
+            <th>IPs</th>
+            @*<th>MACs</th>*@
+            @*<th>客户端IDs</th>*@
+            <th>系统信息</th>
+            <th>上次心跳时间</th>
+            @*<th>创建时间/更新时间</th>*@
+            <th>所属类型</th>
+            <th>服务器状态</th>
+            <th>合同结束时间</th>
+            <th>操作</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var a in Model.list)
+        {
+            <tr>
+                <td>@a.ServerId</td>
+                <td>@a.ServerName</td>
+                <td>@a.ServerIPs</td>
+                @*<td>@a.ServerMACs</td>*@
+                @*<td>@a.ClientIds</td>*@
+                <td>@a.ServerOS</td>
+                <td>
+                    @Html.ToDateString(a.LastHeartTime) @{
+            if (a.LastHeartTime != null)
+            {
+                if (ManageDomain.Pub.IsRigthHeartbeat(a.LastHeartTime.Value))
+                {
+                    <span class="label label-success">心跳正常</span>
+                }
+                else
+                {
+                    <span class="label label-danger">心跳异常</span>
+                }
+            }
+                    }
+                </td>
+                @*<td>@Html.ToDateString(a.CreateTime) / @Html.ToDateString(a.UpdateTime)</td>*@
+                <td>@(a.ServerOfType == 0 ? "公司" : "客户")</td>
+                <td>
+                    @{
+            switch (a.ServerState)
+            {
+                case 0:
+                    <span>使用中</span>
+                    break;
+                case 1:
+                <span>备用</span>
+                    break;
+                case 2:
+                <span>停止使用</span>
+                    break;
+            }
+                    }
+                </td>
+                <td>
+                    @Html.ToDateString(a.ValEndTime, "date")
+                    @if (a.ValEndTime != null)
+                    {
+                        int scode = ManageDomain.Pub.IsServerAlertCode(a.ValEndTime.Value);
+                        if (scode == -1)
+                        {
+                            <span class="label label-danger">已过期</span>
+                        }
+                        else if (scode == 0)
+                        {
+                            <span class="label label-danger">快过期</span>
+                        }
+                    }
+                </td>
+                <td>
+                    <div class="btn-group btn-group-sm">
+                        @Html.ActionLink("编辑", "edit", new { serverid = a.ServerId }, new { @class = "btn btn-default" })
+                        <button class="btn btn-danger" data-item="@a.ServerId" onclick="deleteserver(this)">删除</button>
+                    </div>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+@Html.Pager(new Webdiyer.WebControls.Mvc.PagedList<ManageDomain.Models.ServerMachine>(Model.list, Model.PageNo, Model.PageSize, Model.TotalCount), new PagerOptions { PageIndexParameterName = "pno", NumericPagerItemCount = 5, ContainerTagName = "ul", CssClass = "pagination", CurrentPagerItemTemplate = "<li class=\"active\"><a href=\"#\">{0}</a></li>", DisabledPagerItemTemplate = "<li class=\"disabled\"><a>{0}</a></li>", PagerItemTemplate = "<li>{0}</li>", Id = "bootstrappager2", PageIndexBoxId = "pageIndexBox", GoToButtonId = "goToBtn" })
+
+

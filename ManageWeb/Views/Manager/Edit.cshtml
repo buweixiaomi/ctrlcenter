@@ -1,0 +1,264 @@
+﻿@using ManageWeb
+@model ManageDomain.Models.Manager
+@{
+    ViewBag.Title = (Model == null) ? "新增员工" : "修改员工";
+    Layout = "~/Views/Shared/_LayoutPageHome.cshtml";
+    ManageDomain.Models.Manager manager = Model;
+    List<ManageDomain.Models.UserTag> alltags = ViewBag.alltags;
+    if (manager == null)
+    {
+        manager = new ManageDomain.Models.Manager();
+    }
+    if (manager.Tags == null)
+    { manager.Tags = new List<ManageDomain.Models.UserTag>();}
+}
+@section Head{
+    <script type="text/javascript">
+        ///<reference path="/scripts/jquery-1.9.1.js" />
+        function addconfig() {
+            var t = '             <tr>     <td> <input type="text" class="form-control" placeholder="请尽量只使用字母和下划线" name="configkey" value="" />  </td>   ' +
+                       '                 <td>   <input type="text" class="form-control" placeholder="" name="configvalue" value="" /> </td>   ' +
+                       '                 <td> <input type="text" class="form-control" placeholder="" name="configremark" value="" />   </td> ' +
+                       '                 <td> <button type="button" class="btn btn-danger" onclick="deleteconfig(this)">删除</button>  </td>  </tr>';
+            $("#p_proconfig tbody").append(t);
+        }
+        function deleteconfig(e) {
+            if (!confirm('你确定要删除吗(保存后删除生效)？'))
+                return;
+            $(e).parents('tr').remove();
+        }
+
+        function addtag() {
+            var toaddtagid = $("#usertags").val();
+            var toaddtagtext = $("#usertags option:selected").text();
+            if (!toaddtagid)
+                return;
+            var exist = false;
+            $("#tb_tag .tag").each(function () {
+                if (toaddtagid == $(this).val())
+                    exist = true;
+            });
+            if (exist)
+                return;
+            var t = '<tr>  <td> <input type="hidden" name="tag" class="tag" value="'+toaddtagid+'" />'+
+                        ' <span class="label label-primary" title="">'+toaddtagtext+'</span> </td><td>'+
+                         ' <button type="button" class="btn btn-danger" onclick="deletetag(this)">删除</button> </td> </tr>';
+            $("#tb_tag tbody").append(t);
+        }
+
+        function deletetag(e) {
+            if (!confirm('你确定要删除吗(保存后删除生效)？'))
+                return;
+            $(e).parents('tr').remove();
+        }
+
+        function showselect(ty) {
+            var url = "";
+            switch (ty) {
+                case "customer":
+                    url = "/cusproject/GetCustomers";
+                    break;
+                case "server":
+                    url = "/cusproject/Getservers";
+                    break;
+                case "project":
+                    url = "/cusproject/Getprojects";
+                    break;
+            }
+            $.ajax({
+                url: url,
+                success: function (data) {
+                    $("#m_value").html(data);
+                    $("#m_value li").click(function () {
+                        $("#m_value li").removeClass("label-primary");
+                        $(this).addClass("label-primary");
+                        $(this).data("type", ty);
+                    })
+                    $('#myModal').modal({
+                        keyboard: true
+                    })
+                }
+            });
+        }
+
+        function setselectv() {
+            if ($("#m_value .label-primary").length == 0) {
+                alert("请选择");
+                return;
+            }
+            var val = $("#m_value .label-primary").data("item");
+            var text = $("#m_value .label-primary").data("text");
+            var ty = $("#m_value .label-primary").data("type");
+
+            switch (ty) {
+                case "customer":
+                    $("#CusId").val(val);
+                    $("#show_cusid").text(val + " " + text);
+                    break;
+                case "server":
+                    $("#ServerId").val(val);
+                    $("#show_serverid").text(val + " " + text);
+                    break;
+                case "project":
+                    $("#ProjectId").val(val);
+                    $("#show_projectid").text(val + " " + text);
+                    break;
+            }
+            $('#myModal').modal('hide');
+        }
+
+        function resetpwd(id) {
+            if (!confirm("你确定要重置密码吗？"))
+                return;
+            $.ajax({
+                url: '/manager/resetpwd',
+                type: 'post',
+                data: { managerid: id },
+                success: function (data) {
+                    alert(data.msg);
+                }
+            });
+        }
+    </script>
+}
+<h2>编辑员工信息</h2>
+<p>@Html.ActionLink("返回", "Index", null, new { @class = "btn btn-success" })</p>
+<div>
+    <form class="form-horizontal" role="form" method="post">
+        <div class="form-group">
+            <label for="ManageId" class="col-sm-2 control-label">员工ID</label>
+            <div class="col-sm-10">
+                @if (manager.ManagerId <= 0)
+                {
+                    <input type="text" class="form-control cc-width-4" name="ManagerId" id="ManagerId" placeholder="自动生成" readonly value=""> }
+                else
+                {
+                    <input type="text" class="form-control cc-width-4" name="ManagerId" id="ManagerId" readonly="readonly" value="@manager.ManagerId">
+                }
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="Name" class="col-sm-2 control-label">名称</label>
+            <div class="col-sm-10">
+                <input type="text" class="form-control cc-width-4" name="Name" id="Name" placeholder="" value="@manager.Name">
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="SubName" class="col-sm-2 control-label">别名</label>
+            <div class="col-sm-10">
+                <input type="text" class="form-control cc-width-4" id="SubName" name="SubName" value="@manager.SubName">
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="LoginName" class="col-sm-2 control-label">登录名称</label>
+            <div class="col-sm-10">
+                <input type="text" class="form-control cc-width-4" id="LoginName" name="LoginName" value="@manager.LoginName">
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="LoginPwd" class="col-sm-2 control-label">登录密码</label>
+            <div class="col-sm-10">
+                @if (manager.ManagerId > 0)
+                {
+                    <input type="password" class="form-control cc-width-4 cc-display-inline-block" id="LoginPwd" disabled name="LoginPwd" value="@(string.IsNullOrEmpty(manager.LoginPwd)?"":"exist pwd")">
+                    <button class="btn btn-danger" type="button" onclick="resetpwd('@manager.ManagerId')">重置密码为000000</button>
+                }
+                else
+                {
+                    <input type="password" class="form-control cc-width-4" id="LoginPwd" name="LoginPwd" value="">
+                }
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="AllowLogin" class="col-sm-2 control-label"></label>
+            <div class="col-sm-10">
+                <input type="checkbox" class="form-control cc-width-0-5 cc-display-inline-block" id="AllowLogin" @(manager.AllowLogin == 1 ? "checked=\"checked\"" : "") name="AllowLogin"><span>允许登录</span>
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="State" class="col-sm-2 control-label">状态</label>
+            <div class="col-sm-10">
+                @Html.DropDownList("State", new List<SelectListItem>() {
+                new SelectListItem(){ Text = "正常" ,Value ="0", Selected = manager.State==0},
+                new SelectListItem(){ Text = "冻结" ,Value ="1", Selected = manager.State==1}
+                }, new { @class = "form-control  cc-width-3" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="" class="col-sm-2 control-label">分组标签</label>
+            <div class="col-sm-10">
+                <div class="panel panel-default" style="max-width:400px;">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">
+                            <select id="usertags" class="form-control cc-width-1-5 cc-display-inline-block">
+                                @foreach (var tt in alltags)
+                                { 
+                                    <option value="@tt.UserTagId">@tt.Tag</option>
+                                }
+                            </select>
+                            <button type="button" class="btn btn-primary" onclick="addtag()">增加绑定分组</button>
+                        </h3>
+                    </div>
+                    <table class="table table-bordered" id="tb_tag">
+                        <tbody>
+                            @foreach (var a in manager.Tags)
+                                {
+                                    <tr>
+                                        <td>
+                                            <input type="hidden" class="tag" name="tag" value="@a.UserTagId" />
+                                            <span class="label label-primary" title="@a.Remark">@a.Tag</span>
+                                        </td>
+                                        <td>
+                                            <button type="button" class="btn btn-danger" onclick="deletetag(this)">删除</button>
+                                        </td>
+                                    </tr>
+                                }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="Remark" class="col-sm-2 control-label">备注</label>
+            <div class="col-sm-10">
+                <textarea class="form-control cc-width-6" rows="4" id="Remark" name="Remark">@(manager.Remark)</textarea>
+            </div>
+        </div>
+        @if (manager.ManagerId > 0)
+        {
+            <div class="form-group">
+                <label for="CreateTime" class="col-sm-2 control-label">创建时间</label>
+                <div class="col-sm-10">
+                    <span class="help-block">@Html.ToDateString(manager.CreateTime)</span>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="UpdateTime" class="col-sm-2 control-label">更新时间</label>
+                <div class="col-sm-10">
+                    <span class="help-block">@Html.ToDateString(manager.UpdateTime)</span>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="LastLoginTime" class="col-sm-2 control-label">上次登录时间</label>
+                <div class="col-sm-10">
+                    <span class="help-block">@Html.ToDateString(manager.LastLoginTime)</span>
+                </div>
+            </div>
+        }
+        <div class="form-group">
+            <div class="col-sm-offset-2 col-sm-10">
+                @if (manager.ManagerId <= 0)
+                {
+                    <button type="submit" class="btn btn-primary">新增</button>}
+                else
+                {
+                    <button type="submit" class="btn btn-primary">保存</button>
+                }
+                <span class="label label-info">@ViewBag.msg</span>
+            </div>
+        </div>
+    </form>
+</div>

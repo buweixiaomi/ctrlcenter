@@ -1,0 +1,94 @@
+﻿@model ManageDomain.Models.WorkDaily
+@{
+    Layout = "~/Views/Shared/_LayoutPageHome.cshtml";
+    string WorkTime = "";
+    string Score = "3";
+    string Summary = "";
+    string Content = "";
+    string WorkDailyId = "";
+    bool canedit = true;
+    string managerid = ViewBag.managerid;
+    string managername = ViewBag.managername;
+    if (Model != null)
+    {
+        ViewBag.Title = "编辑工作日志";
+        WorkTime = Model.WorkTime.ToString("yyyy-MM-dd");
+        Score = Model.Score.ToString();
+        Summary = Model.Summary ?? "";
+        Content = Model.Content;
+        WorkDailyId = Model.WorkDailyId.ToString();
+        managerid = Model.ManagerId.ToString();
+        managername = Model.ManagerName;
+    }
+    else { 
+        ViewBag.Title = "添加工作日志";
+    }
+    if (ViewBag.CanEdit != null)
+    {
+        canedit = ViewBag.CanEdit;
+    }
+}
+
+@section Head{
+    <script type="text/javascript">
+        ///<reference path="/scripts/jquery-1.9.1.js" />
+        ///<reference path="/scripts/main.js" />
+        var defaultworkdate = '@ViewBag.defaultworkdate';
+        $(document).ready(function () {
+            if (defaultworkdate) {
+                $("#WorkTime").val(defaultworkdate);
+                libworkdaily.index_datechange();
+            }
+        });
+    </script>
+    }
+
+<div class="container cc-width-7">
+    <form method="post">
+        <div class="panel">
+            <input type="hidden" name="WorkDailyId" value="@WorkDailyId" id="WorkDailyId" />
+            <h2>@ViewBag.Title</h2>
+            <div class="form-group">
+                <label>提交日期：</label>
+                <input type="text" class="form-control cc-display-inline-block cc-width-2" @(canedit ? "" : "disabled") name="WorkTime" id="WorkTime" value="@WorkTime" onchange="libworkdaily.index_datechange(this)" onclick="    WdatePicker({ dateFmt: 'yyyy-MM-dd' })" />
+                <span class="" id="date_msg"></span>
+            </div>
+            <div class="form-group">
+                <label>提交人员：</label>
+                <input type="text" class="form-control cc-display-inline-block cc-width-2" disabled value="@managername" />
+                <label>自我评定：</label>
+                @Html.DropDownList("Score", new List<SelectListItem>() {
+           new SelectListItem(){ Text = "非常好" ,Value = "5" , Selected = Score =="5"},
+           new SelectListItem(){ Text = "比较好" ,Value = "4" , Selected = Score =="4"},
+           new SelectListItem(){ Text = "正常" ,Value = "3", Selected = Score =="3"},
+           new SelectListItem(){ Text = "略低" ,Value = "2", Selected = Score =="2"},
+           new SelectListItem(){ Text = "很差" ,Value = "1", Selected = Score =="1"}
+           }, new { @class = "form-control cc-display-inline-block cc-width-2" })
+            </div>
+
+            @*<div class="form-group">
+                <label>工作概要：</label>
+                <input type="text" class="form-control cc-display-inline-block cc-width-4" name="Summary" id="Summary" value="@Summary" @(canedit ? "" : "disabled") />
+            </div>*@ 
+        </div>
+        <div class="panel panel-success">
+            <div class="panel-heading">
+                <h3 class="panel-title">
+                    工作内容 @if (canedit) { 
+                         <button type="button" class="btn btn-sm btn-primary" onclick="libworkdaily.index_autobuild()">根据工作生成</button>
+                         }
+                </h3>
+            </div>
+            <div class="panel-body">
+                <textarea rows="18" class="form-control" name="Content" id="Content" @(canedit ? "" : "disabled")>@Content</textarea>
+            </div>
+        </div>
+        <div class="form-group text-right">
+            @if (canedit)
+            {
+                <input type="submit" value="提交" class="btn btn-primary" onclick="return libworkdaily.index_presubmit()" />
+                <span class="label label-warning">@ViewBag.msg</span>
+            }
+        </div>
+    </form>
+</div>

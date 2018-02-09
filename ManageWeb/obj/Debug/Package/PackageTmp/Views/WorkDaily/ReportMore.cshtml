@@ -1,0 +1,49 @@
+﻿@model List<Tuple<ManageDomain.Models.Manager, Dictionary<string, ManageDomain.Models.WorkDaily>>>
+@{ 
+    int? search_state = ViewBag.search_state;
+    search_state = search_state ?? 0;
+    string str_state = search_state.ToString();
+    List<ManageDomain.Models.UserTag> managertags = ViewBag.tags;
+    List<SelectListItem> gtags = new List<SelectListItem>();
+    DateTime currbegintime = ViewBag.realbegintime;
+    DateTime currendtime = ViewBag.realendtime;
+    DateTime tempend = currendtime;
+    foreach (var a in managertags)
+    {
+        gtags.Add(new SelectListItem() { Text = a.Tag, Value = a.UserTagId.ToString(), Selected = a.UserTagId.ToString() == (string)ViewBag.groupid });
+    }
+}
+
+ @{tempend = currendtime;}
+@for (; tempend >= currbegintime; tempend = tempend.AddDays(-1))
+{
+    <tr>
+        <th height="200px" class="cc-workdaily-report-time" width="150px">@tempend.ToString("yyyy-MM-dd")<br /> @tempend.ToString("dddd")</th>
+        @foreach (var a in Model)
+        {
+            <td width="250px">
+                <div class="cc-report-itemcontent">
+                    @if (a.Item2.ContainsKey(tempend.ToString("yyyy-MM-dd")))
+                    {
+                        <p class="text-right" style="float:right;"><a target="_blank" class="btn-link" href="/workdaily/edit?workdailyid=@a.Item2[tempend.ToString("yyyy-MM-dd")].WorkDailyId">详情</a></p>
+                        <textarea disabled style="width:220px; height:150px;">@a.Item2[tempend.ToString("yyyy-MM-dd")].Content</textarea>
+                    }
+                    else
+                    {
+                        <span></span>
+                    }
+                </div>
+            </td>
+        }
+    </tr>
+}
+<tr id="hasmore_tr">
+    <th class="cc-report-border-none"></th>
+    <th colspan="@((int)((currendtime-currbegintime).TotalDays))">
+        @if (ViewBag.hasmore)
+        {
+            <button class="btn btn-primary" style="height:80px; width:100%; padding:5px;" data-begintime="@ViewBag.nextbegintime" onclick="libworkdaily.report_hasmore(this)" data-endtime="@ViewBag.nextendtime" data-groupid="@ViewBag.groupid">查看更多</button>
+
+        }
+    </th>
+</tr>

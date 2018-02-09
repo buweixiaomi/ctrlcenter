@@ -1,0 +1,64 @@
+﻿@using Webdiyer.WebControls.Mvc
+@using ManageWeb
+@model ManageDomain.Models.PageModel<ManageDomain.Models.CusService>
+@{
+}
+
+<table class="table table-bordered table-hover">
+    <thead>
+        <tr>
+            <th width="60px;">编号</th>
+            <th width="100px;">客户ID</th>
+            <th width="150px;">客户名称</th>
+            <th>服务标题</th>
+            <th width="200px;">服务时间</th>
+            <th>服务器类型</th>
+            <th>服务费(&yen;)</th>
+            <th width="200px">创建时间</th>
+            <th width="200px">创建人</th>
+            <th width="">备注</th>
+            <th>操作</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var a in Model.list)
+        {
+            <tr>
+                <td>@a.CusServiceId</td>
+                <td>@a.CusId</td>
+                <td>@a.Customer.CustomerName</td>
+                <td>@a.Title</td>
+                <td>@Html.ToDateString(a.ServiceTime)</td>
+                <td>
+                    @switch (a.ServiceType)
+                    {
+                        case 0:
+                            <span class="label label-info">默认</span>
+                            break;
+                        case 1:
+                        <span class="label label-info">Bug修改</span>
+                            break;
+                        case 2:
+                        <span class="label label-info">功能调整</span>
+                            break;
+                        case 3:
+                        <span class="label label-info">新需求</span>
+                            break;
+                        default:
+                        <span class="label label-info">未知@(a.ServiceType)</span>
+                            break;
+                    }
+                </td>
+
+                <td>@a.ServiceCharge</td>
+                <td>@Html.ToDateString(a.CreateTime)</td>
+                <td>@a.CreateManagerId @a.CreateManagerName</td>
+                <td>@a.Remark</td>
+                <td>@Html.ActionLink("详情", "Detail", new { cusserviceid = a.CusServiceId })</td>
+            </tr>
+        }
+    </tbody>
+</table>
+@Html.Pager(new Webdiyer.WebControls.Mvc.PagedList<object>(Model.list, Model.PageNo, Model.PageSize, Model.TotalCount), new PagerOptions { PageIndexParameterName = "pno", NumericPagerItemCount = 5, ContainerTagName = "ul", CssClass = "pagination", CurrentPagerItemTemplate = "<li class=\"active\"><a href=\"#\">{0}</a></li>", DisabledPagerItemTemplate = "<li class=\"disabled\"><a>{0}</a></li>", PagerItemTemplate = "<li>{0}</li>", Id = "bootstrappager2", PageIndexBoxId = "pageIndexBox", GoToButtonId = "goToBtn" })
+
+

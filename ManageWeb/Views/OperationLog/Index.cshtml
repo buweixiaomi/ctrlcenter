@@ -1,0 +1,22 @@
+﻿@model ManageDomain.Models.PageModel<ManageDomain.Models.OperationLog>
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_LayoutPageHome.cshtml";
+}
+
+<h2>操作日志</h2>
+<div class="cc-content-header">
+    <form class="form-inline" role="form">
+        <div class="form-group">
+            <label for="keywords">关键字</label>
+            <input type="text" class="form-control" id="keywords" value="@ViewBag.keywords" name="keywords" placeholder="操作人/标题" />
+        </div>
+        <div class="form-group">
+            <label for="ContractBeginTime">操作时间</label>
+            <input type="text" class="form-control cc-width-2 cc-display-inline-block" id="BeginTime" onclick="WdatePicker({ dateFmt: 'yyyy-MM-dd' })" name="BeginTime" value="@ViewBag.BeginTime">
+            <input type="text" class="form-control cc-width-2 cc-display-inline-block" id="EndTime" onclick="WdatePicker({ dateFmt: 'yyyy-MM-dd' })" name="EndTime" value="@ViewBag.EndTime">
+        </div>
+        <button type="submit" class="btn btn-default">查询</button>
+    </form>
+</div>
+@Html.Partial("Index_Sub", Model)

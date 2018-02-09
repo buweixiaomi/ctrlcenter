@@ -1,0 +1,220 @@
+﻿@{
+    ViewBag.Title = "性能详情";
+    Layout = "~/Views/Shared/_LayoutPageHome.cshtml";
+
+    ManageDomain.Models.ServerMachine server = ViewBag.server;
+
+}
+@section Head{
+    <script src="~/Scripts/highchart/highcharts.js"></script>
+    <script src="~/Scripts/highchart/modules/exporting.js"></script>
+    <script type="text/javascript">
+        ///<reference path="/scripts/jquery-1.9.1.js" />
+        ///<reference path="/scripts/main.js" />
+        var serverid = @ViewBag.serverid;
+
+        function getchartandshow(ty,formid,chartid){
+            var showchart = function(data){
+                $(chartid).highcharts({
+                    chart:{
+                        zoomType: data.chart.zoomType
+                    },
+                    title: {
+                        text: data.title,
+                        x: -20 //center
+                    },
+                    subtitle: {
+                        text: data.subtitle,
+                        x: -20
+                    },
+                    xAxis: {
+                        categories: data.categories
+                    },
+                    yAxis: {
+                        title: {
+                            text: data.ytitle
+                        },
+                        plotLines: [{
+                            value: 0,
+                            width: 1,
+                            color: '#808080'
+                        }]
+                    },
+                    tooltip: {
+                        valueSuffix: data.unit
+                    },
+                    legend: {
+                        layout: 'horizontal',
+                        align: 'center',
+                        verticalAlign: 'bottom',
+                        borderWidth: 0
+                    },
+                    series: data.series
+                });
+            }
+
+            $.ajax({
+                url: '/performance/getchartdata?serverid='+serverid+"&datatype="+ty,
+                data: $(formid).serialize(),
+                type:'post',
+                success:function(data){
+                    if(data.code>0){
+                        showchart(data.data);
+                    }else{
+                        alert(data.msg);
+                    }
+                },
+                error:function(){
+                    alert('请求出错！');
+                }
+            });
+        }
+
+        $(document).ready(function(){
+            $(".charts form button[type='button']").click();
+        });
+
+        function searchall(){
+            $(".txt-start").val($("#text_start").val());
+            $(".txt-end").val($("#text_end").val());
+            $('.btn-search').click();
+        }
+    </script>
+}
+
+<h2>性能详情 [@server.ServerName]<a href="/performance/index" class="btn btn-sm btn-default"><span class="glyphicon glyphicon-chevron-left"></span>返回服务器列表</a></h2>
+<div>
+    <form class="form-inline" role="form">
+        <div class="form-group">
+            <label for="keywords">开始日期</label>
+            <input type="text" class="form-control" id="text_start" value="@DateTime.Now.AddHours(-0.5).ToString("yyyy-MM-dd HH:mm:ss")" onclick="WdatePicker({ dateFmt: 'yyyy-MM-dd HH:mm:ss' })" name="begintime" />
+        </div>
+        <div class="form-group">
+            <label for="keywords">结束日期</label>
+            <input type="text" class="form-control" id="text_end" value="@DateTime.Now.AddHours(0.5).ToString("yyyy-MM-dd HH:mm:ss")" onclick="WdatePicker({ dateFmt: 'yyyy-MM-dd HH:mm:ss' })" name="endtime" />
+        </div>
+        <button type="button" class="btn btn-default" onclick="searchall()">查询</button>
+    </form>
+</div>
+<div class="charts">
+    <div id="con_cupchart" class="one-chart">
+        <h3>CPU情况</h3>
+        <div>
+            <form class="form-inline" role="form">
+                <div class="form-group">
+                    <label for="keywords">开始日期</label>
+                    <input type="text" class="form-control txt-start" value="@DateTime.Now.AddHours(-0.5).ToString("yyyy-MM-dd HH:mm:ss")" onclick="WdatePicker({ dateFmt: 'yyyy-MM-dd HH:mm:ss' })" name="begintime" />
+                </div>
+                <div class="form-group">
+                    <label for="keywords">结束日期</label>
+                    <input type="text" class="form-control txt-end" value="@DateTime.Now.AddHours(0.5).ToString("yyyy-MM-dd HH:mm:ss")" onclick="WdatePicker({ dateFmt: 'yyyy-MM-dd HH:mm:ss' })" name="endtime" />
+                </div>
+                <button type="button" class="btn btn-default btn-search" onclick="getchartandshow('cpu','#con_cupchart form','#cupchart')">查询</button>
+            </form>
+        </div>
+        <div>
+            <div id="cupchart" style="min-width:400px;height:400px"></div>
+        </div>
+    </div>
+
+    <div id="con_memorychart" class="one-chart">
+        <h3>内存使用情况</h3>
+        <div>
+            <form class="form-inline" role="form">
+                <div class="form-group">
+                    <label for="keywords">开始日期</label>
+                    <input type="text" class="form-control txt-start" value="@DateTime.Now.AddHours(-0.5).ToString("yyyy-MM-dd HH:mm:ss")" onclick="WdatePicker({ dateFmt: 'yyyy-MM-dd HH:mm:ss' })" name="begintime" />
+                </div>
+                <div class="form-group">
+                    <label for="keywords">结束日期</label>
+                    <input type="text" class="form-control txt-end" value="@DateTime.Now.AddHours(0.5).ToString("yyyy-MM-dd HH:mm:ss")" onclick="WdatePicker({ dateFmt: 'yyyy-MM-dd HH:mm:ss' })" name="endtime" />
+                </div>
+                <button type="button" class="btn btn-default btn-search" onclick="getchartandshow('memory','#con_memorychart form','#memorychart')">查询</button>
+            </form>
+        </div>
+        <div>
+            <div id="memorychart" style="min-width:400px;height:400px"></div>
+        </div>
+    </div>
+
+    <div id="con_diskiochart" class="one-chart">
+        <h3>磁盘IO情况</h3>
+        <div>
+            <form class="form-inline" role="form">
+                <div class="form-group">
+                    <label for="keywords">开始日期</label>
+                    <input type="text" class="form-control txt-start" value="@DateTime.Now.AddHours(-0.5).ToString("yyyy-MM-dd HH:mm:ss")" onclick="WdatePicker({ dateFmt: 'yyyy-MM-dd HH:mm:ss' })" name="begintime" />
+                </div>
+                <div class="form-group">
+                    <label for="keywords">结束日期</label>
+                    <input type="text" class="form-control txt-end" value="@DateTime.Now.AddHours(0.5).ToString("yyyy-MM-dd HH:mm:ss")" onclick="WdatePicker({ dateFmt: 'yyyy-MM-dd HH:mm:ss' })" name="endtime" />
+                </div>
+                <button type="button" class="btn btn-default btn-search" onclick="getchartandshow('diskio','#con_diskiochart form','#diskiochart')">查询</button>
+            </form>
+        </div>
+        <div>
+            <div id="diskiochart" style="min-width:400px;height:400px"></div>
+        </div>
+    </div>
+
+    <div id="con_networkiochart" class="one-chart">
+        <h3>网络IO情况</h3>
+        <div>
+            <form class="form-inline" role="form">
+                <div class="form-group">
+                    <label for="keywords">开始日期</label>
+                    <input type="text" class="form-control txt-start" value="@DateTime.Now.AddHours(-0.5).ToString("yyyy-MM-dd HH:mm:ss")" onclick="WdatePicker({ dateFmt: 'yyyy-MM-dd HH:mm:ss' })" name="begintime" />
+                </div>
+                <div class="form-group">
+                    <label for="keywords">结束日期</label>
+                    <input type="text" class="form-control txt-end" value="@DateTime.Now.AddHours(0.5).ToString("yyyy-MM-dd HH:mm:ss")" onclick="WdatePicker({ dateFmt: 'yyyy-MM-dd HH:mm:ss' })" name="endtime" />
+                </div>
+                <button type="button" class="btn btn-default btn-search" onclick="getchartandshow('networkio','#con_networkiochart form','#networkiochart')">查询</button>
+            </form>
+        </div>
+        <div>
+            <div id="networkiochart" style="min-width:400px;height:400px"></div>
+        </div>
+    </div>
+
+    <div id="con_httprequestchart" class="one-chart">
+        <h3>Http并发数</h3>
+        <div>
+            <form class="form-inline" role="form">
+                <div class="form-group">
+                    <label for="keywords">开始日期</label>
+                    <input type="text" class="form-control txt-start" value="@DateTime.Now.AddHours(-0.5).ToString("yyyy-MM-dd HH:mm:ss")" onclick="WdatePicker({ dateFmt: 'yyyy-MM-dd HH:mm:ss' })" name="begintime" />
+                </div>
+                <div class="form-group">
+                    <label for="keywords">结束日期</label>
+                    <input type="text" class="form-control txt-end" value="@DateTime.Now.AddHours(0.5).ToString("yyyy-MM-dd HH:mm:ss")" onclick="WdatePicker({ dateFmt: 'yyyy-MM-dd HH:mm:ss' })" name="endtime" />
+                </div>
+                <button type="button" class="btn btn-default btn-search" onclick="getchartandshow('httprequest','#con_httprequestchart form','#httprequestchart')">查询</button>
+            </form>
+        </div>
+        <div>
+            <div id="httprequestchart" style="min-width:400px;height:400px"></div>
+        </div>
+    </div>
+
+
+    <div id="con_diskspacechart" class="one-chart">
+        <h3>磁盘空间情况</h3>
+        <div>
+            <form class="form-inline" role="form">
+                <div class="form-group">
+                    <label for="keywords">开始日期</label>
+                    <input type="text" class="form-control txt-start" value="@DateTime.Now.AddHours(-0.1).ToString("yyyy-MM-dd HH:mm:ss")" onclick="WdatePicker({ dateFmt: 'yyyy-MM-dd HH:mm:ss' })" name="begintime" />
+                </div>
+                <div class="form-group">
+                    <label for="keywords">结束日期</label>
+                    <input type="text" class="form-control txt-end" value="@DateTime.Now.AddHours(0).ToString("yyyy-MM-dd HH:mm:ss")" onclick="WdatePicker({ dateFmt: 'yyyy-MM-dd HH:mm:ss' })" name="endtime" />
+                </div>
+                <button type="button" class="btn btn-default btn-search" onclick="getchartandshow('diskspace','#con_diskspacechart form','#diskspacechart')">查询</button>
+            </form>
+        </div>
+        <div>
+            <div id="diskspacechart" style="min-width:400px;height:400px"></div>
+        </div>
+    </div>
+</div>

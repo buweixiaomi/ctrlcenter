@@ -1,0 +1,166 @@
+﻿@using ManageWeb
+@model ManageDomain.Models.WatchLog.TimeWatch
+@{
+    ViewBag.Title = "日志详情";
+    Layout = "~/Views/Shared/_LayoutPageHome.cshtml";
+    ManageDomain.Models.WatchLog.TimeWatch mainlog = Model;
+    List<ManageDomain.Models.WatchLog.TimeWatch> sublogs = null;
+    int typelimeorder = 0;
+    if (ViewBag.typelimeorder != null)
+    {
+        typelimeorder = ViewBag.typelimeorder;
+    }
+    double totalseconds = 0;
+    if (ViewBag.sublogs != null)
+    {
+        sublogs = ViewBag.sublogs;
+        if (sublogs.Count > 0)
+        {
+            var max = sublogs.OrderByDescending(x => x.CreateTime).First();
+            var min = sublogs.OrderBy(x => x.CreateTime).First();
+            totalseconds = (max.CreateTime - min.CreateTime).TotalSeconds;// +max.Elapsed;
+        }
+    }
+}
+@section Head{
+    <script type="text/javascript">
+        ///<reference path="/scripts/jquery-1.9.1.js" />
+        ///<reference path="/scripts/main.js" />
+        ///<reference path="/Scripts/ckeditor/ckeditor.js" />
+    </script>
+}
+<h2>@ViewBag.Title <a class="btn btn-success" onclick="javascript: history.go(-1);">返回 </a></h2>
+<div>
+    <div style="max-width:1200px; min-width:800px;">
+        <table class="table table-bordered">
+            <tbody>
+                <tr>
+                    <td><label class="text-primary">ID</label></td>
+                    <td colspan="3">
+                        <span>@mainlog.Id</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td><label class="text-primary">项目名称:</label></td>
+                    <td><span>@mainlog.ProjectName</span></td>
+                    <td><label class="text-primary">日志类型:</label></td>
+                    <td>
+                        @switch (mainlog.LogType)
+                        {
+                            case 0:
+                                <span>普通日志</span>
+                                break;
+                            case 1:
+                            <span>耗时日志</span>
+                                break;
+                            case 2:
+                            <span>错误日志</span>
+                                break;
+                        }
+                    </td>
+                </tr>
+                <tr>
+                    <td><label class="text-primary">创建时间:</label></td>
+                    <td><span>@Html.ToDateString(mainlog.CreateTime, "yyyy-MM-dd HH:mm:ss.fff")</span></td>
+                    <td><label class="text-primary">数据库时间:</label></td>
+                    <td><span>@Html.ToDateString(mainlog.DbCreateTime, "yyyy-MM-dd HH:mm:ss.fff")</span></td>
+                </tr>
+                <tr>
+                    <td><label for="EstimateTime" class="text-primary">大分组</label></td>
+                    <td><span class="">@mainlog.GroupID</span></td>
+                    <td><label for="EstimateTime" class="text-primary">小分组</label></td>
+                    <td><span class="">@mainlog.InnerGroupID</span></td>
+                </tr>
+                @if (mainlog.LogType == 1)
+                {
+                    <tr>
+                        <td><label class="text-primary" for="Content">用时</label></td>
+                        <td colspan="1">
+                            <span> @mainlog.Elapsed.ToString("0.0000") s </span>或<span>@((mainlog.Elapsed * 1000).ToString("0.0000")) ms</span>
+                        </td>
+
+                        <td><label class="text-primary" for="Content">附加</label></td>
+                        <td colspan="1">
+                            <span>@mainlog.Addition</span>
+                        </td>
+                    </tr>
+                }
+                <tr>
+                    <td colspan="4">
+                        <label for="Point" class="text-primary">标题</label><br />
+                        <pre style="max-width:900px; word-break:break-all;">@mainlog.Title</pre>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="4">
+                        <label for="Point" class="text-primary">内容</label><br />
+                        <pre style="max-width:900px; word-break:break-all;">@mainlog.Content</pre>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+    </div>
+</div>
+@if (sublogs != null)
+{
+    <div>
+        <h3>
+            时间线-同一请求流
+            <span>总用时:<span class="text-primary">@((totalseconds * 1000).ToString("0.000"))</span>ms</span>
+            @if (typelimeorder == 0)
+            {
+                <button disabled class="btn btn-primary btn-sm">按时间排</button>
+                @Html.ActionLink("按耗时排", "Detail", new { id = mainlog.Id, typelimeorder = 1, date = mainlog.CreateTime.ToString("yyyy-MM-dd HH:mm:ss") }, new { @class = "btn btn-primary btn-sm" })
+            }
+            else
+            {
+                @Html.ActionLink("按时间排", "Detail", new { id = mainlog.Id, typelimeorder = 0, date = mainlog.CreateTime.ToString("yyyy-MM-dd HH:mm:ss") }, new { @class = "btn btn-primary btn-sm" })
+                <button disabled class="btn btn-primary btn-sm">按耗时排</button>
+            }
+        </h3>
+        <div style="min-width:800px; max-width:1200px;">
+            <table width="100%" class="timeline-table">
+                <tr>
+                    <th>ID</th>
+                    <th>时间</th>
+                    <th>标题</th>
+                    <th>用时</th>
+                    <th></th>
+                    <th></th>
+                </tr>
+                @foreach (var a in sublogs)
+                {
+                    <tr style="@((mainlog.Id == a.Id) ? "background-color:#ddd;" : "")">
+                        <td width="80px" style="word-break:break-all;">@a.Id</td>
+                        <td width="100px" style="word-break:break-all;">@a.CreateTime.ToString("HH:mm:ss.fff")</td>
+                        <td width="250px" style="word-break:break-all;">@a.Title</td>
+                        <td width="100px">@((a.Elapsed * 1000).ToString("0.00")) ms</td>
+                        <td>
+                            @{
+                    double ms = a.Elapsed * 1000;
+                    int width = 0;
+                    if (ms < 0.5)
+                    {
+                        width = 2;
+                    }
+                    else if (ms >= 0.5 && ms < 200)
+                    {
+                        width = 2 + (int)ms;
+                    }
+                    else
+                    {
+                        width = 250;
+                    }
+                            }
+                            <span style="display:inline-block; height:24px; background-color:#bf1711; width:@(width)px;"> </span>
+                        </td>
+                        <td width="50px;">
+                            @Html.ActionLink("详情", "Detail", new { id = a.Id, typelimeorder = typelimeorder, date = a.CreateTime.ToString("yyyy-MM-dd HH:mm:ss") }, new { @class = "" })
+                        </td>
+                    </tr>
+                }
+            </table>
+        </div>
+    </div>
+}

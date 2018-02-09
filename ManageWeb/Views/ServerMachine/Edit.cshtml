@@ -1,0 +1,246 @@
+﻿@using ManageWeb
+@model ManageDomain.Models.ServerMachine
+@{
+    ViewBag.Title = (Model == null) ? "新增服务器" : "修改服务器-[" + Model.ServerId + " " + Model.ServerName + "]";
+    Layout = "~/Views/Shared/_LayoutPageHome.cshtml";
+    var model = Model == null ? new ManageDomain.Models.ServerMachine() : Model;
+    var configs = new List<ManageDomain.Models.ServerConfig>();
+    if (ViewBag.configs != null)
+    {
+        configs = ViewBag.configs;
+    }
+}
+
+@section Head{
+    <script type="text/javascript">
+        function addconfig() {
+            var t = '             <tr>     <td>  <input type="text" class="form-control" placeholder="请尽量只使用字母和下划线" name="configkey" value="" />  </td>   ' +
+                       '                 <td>   <input type="text" class="form-control" placeholder="" name="configvalue" value="" /> </td>   ' +
+                       '                 <td> <input type="text" class="form-control" placeholder="" name="configremark" value="" />   </td> ' +
+                       '                 <td> <button type="button" class="btn btn-danger" onclick="deleteconfig(this)">删除</button>  </td>  </tr>';
+            $("#p_proconfig tbody").append(t);
+        }
+        function deleteconfig(e) {
+            if (!confirm('你确定要删除吗(保存后删除生效)？'))
+                return;
+            $(e).parents('tr').remove();
+        }
+
+        function getjsonconfig(id) {
+            $.ajax({
+                url: '/servermachine/getconfig',
+                data: { serverid: id },
+                type: 'post',
+                success: function (data) {
+                    $("#divconfig").val(data.data.config);
+                }
+            });
+        }
+
+        function getcacheclients() {
+            $.ajax({
+                url: '/servermachine/GetCacheClients',
+                type: 'post',
+                success: function (data) {
+                    if (data.code > 0) {
+                        var b = "";
+                        var c = 0;
+                        for (var a in data.data) {
+                            c++;
+                            b += '<p class="text-left"><em class="label label-info">' + a + "</em>" + data.data[a] + '</p>';
+                        }
+                        b += "<p>结束共" + c + "个</p>";
+                        $("#cacheclients").html(b);
+                    }
+                }
+            });
+        }
+    </script>
+}
+<h2>@ViewBag.Title</h2>
+<p>@Html.ActionLink("返回", "Index", null, new { @class = "btn btn-success" })</p>
+<div>
+    <form class="form-horizontal" role="form" method="post">
+        <div class="form-group">
+            <label for="serverId" class="col-sm-2 control-label">服务器ID</label>
+            <div class="col-sm-10">
+                @if (model.ServerId <= 0)
+                {
+                    <input type="text" class="form-control cc-width-2" name="serverId" id="serverId" placeholder="自动生成" readonly="readonly" value=""> }
+                else
+                {
+                    <input type="text" class="form-control cc-width-2" name="serverId" id="serverId" readonly="readonly" value="@(model.ServerId)">
+                }
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="serverName" class="col-sm-2 control-label">服务器名称</label>
+            <div class="col-sm-10">
+                <input type="text" class="form-control cc-width-5" id="serverName" name="serverName" placeholder="请输入服务器名称" value="@(model.ServerName)">
+                <div>
+                    <button type="button" onclick="getcacheclients()" class="btn btn-primary">得到未绑定客户端</button><br />
+                    <div id="cacheclients"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="ServerIPs" class="col-sm-2 control-label">IP地址</label>
+            <div class="col-sm-10">
+                <input type="text" class="form-control  cc-width-5" id="ServerIPs" name="ServerIPs" placeholder="" value="@(model.ServerIPs)">
+                <span class="help-block">用"/"或"，"号隔开</span>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="ServerMACs" class="col-sm-2 control-label">MAC地址</label>
+            <div class="col-sm-10">
+                <input type="text" class="form-control cc-width-5" id="ServerMACs" name="ServerMACs" placeholder="" value="@(model.ServerMACs)">
+                <span class="help-block">用"/"或"，"号隔开</span>
+            </div>
+        </div>
+
+
+        <div class="form-group">
+            <label for="ClientIds" class="col-sm-2 control-label">关联客户端ID</label>
+            <div class="col-sm-10">
+                <input type="text" class="form-control cc-width-5" id="ClientIds" name="ClientIds" value="@(model.ClientIds)">
+            </div>
+        </div>
+
+
+        <div class="form-group">
+            <label for="ServerOS" class="col-sm-2 control-label">系统信息</label>
+            <div class="col-sm-10">
+                <textarea class="form-control cc-width-5" rows="8" id="ServerOS" name="ServerOS">@(model.ServerOS)</textarea>
+                <span class="help-block">如： server2008 64位 8GB 10MB网速 操作系统 硬盘</span>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="ServerOfType" class="col-sm-2 control-label">所属信息</label>
+            <div class="col-sm-10">
+                @Html.DropDownList("ServerOfType", new List<SelectListItem>() {
+           new SelectListItem(){ Text = "公司" ,Value ="0", Selected = model.ServerOfType==0},
+           new SelectListItem(){ Text = "客户" ,Value ="1", Selected = model.ServerOfType==1}
+                    }, new { @class = "form-control cc-width-3" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="ValStartTime" class="col-sm-2 control-label">服务器合同时间</label>
+            <div class="col-sm-10">
+                <input type="text" class="form-control cc-width-2 cc-display-inline-block" id="ValStartTime" name="ValStartTime" value="@Html.ToDateString(model.ValStartTime,"date")" onclick="WdatePicker({ dateFmt: 'yyyy-MM-dd' })" />到
+                <input type="text" class="form-control cc-width-2 cc-display-inline-block" id="ValEndTime" name="ValEndTime" value="@Html.ToDateString(model.ValEndTime,"date")" onclick="WdatePicker({ dateFmt: 'yyyy-MM-dd' })" />
+            </div>
+        </div>
+
+
+        <div class="form-group">
+            <label for="" class="col-sm-2 control-label">服务器配置</label>
+            <div class="col-sm-10">
+                <div class="panel panel-default" style="max-width:800px;">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">
+                            <button type="button" class="btn btn-primary" onclick="addconfig()">增加配置</button>
+                        </h3>
+                    </div>
+                    <table class="table table-bordered" id="p_proconfig">
+                        <thead>
+                            <tr>
+                                <th>参数代码</th>
+                                <th>参数值</th>
+                                <th>备注</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var a in configs)
+                            {
+                            <tr>
+                                <td>
+                                    <input type="text" class="form-control" placeholder="请尽量只使用字母和下划线" name="configkey" value="@a.ConfigKey">
+                                </td>
+                                <td>
+                                    <input type="text" class="form-control" placeholder="" name="ConfigValue" value="@a.ConfigValue">
+                                </td>
+                                <td>
+                                    <input type="text" class="form-control" placeholder="" name="configremark" value="@a.Remark">
+                                </td>
+                                <td>
+                                    <button type="button" class="btn btn-danger" onclick="deleteconfig(this)">删除</button>
+                                </td>
+                            </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="Remark" class="col-sm-2 control-label">备注</label>
+            <div class="col-sm-10">
+                <textarea class="form-control cc-width-5" rows="5" id="Remark" name="Remark">@(model.Remark)</textarea>
+            </div>
+        </div>
+        @if (model.ServerId > 0)
+        {
+            <div class="form-group">
+                <label for="serverName" class="col-sm-2 control-label">创建时间</label>
+                <div class="col-sm-10">
+                    <span class="help-block">@Html.ToDateString(model.CreateTime)</span>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="serverName" class="col-sm-2 control-label">更新时间</label>
+                <div class="col-sm-10">
+                    <span class="help-block">@Html.ToDateString(model.UpdateTime)</span>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="serverName" class="col-sm-2 control-label">配置更新时间</label>
+                <div class="col-sm-10">
+                    <span class="help-block">@Html.ToDateString(model.ConfigUpdateTime)</span>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="serverName" class="col-sm-2 control-label">上次心跳时间</label>
+                <div class="col-sm-10">
+                    <span class="help-block">@Html.ToDateString(model.LastHeartTime)</span>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="serverName" class="col-sm-2 control-label">配置JSON</label>
+                <div class="col-sm-10">
+                    <div class="panel panel-default">
+                        @*<div class="panel-heading">
+                            <button type="button" class="btn btn-primary" onclick="getjsonconfig(@(model.ServerId))">取得配置</button>
+                        </div>*@
+                        <div class="panel-body" id="">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <textarea id="divconfig" disabled class="form-control" rows="10">@Html.Raw(model.Config)</textarea>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+        <div class="form-group">
+            <div class="col-sm-offset-2 col-sm-10">
+                @if (model.ServerId <= 0)
+                {
+                    <button type="submit" class="btn btn-primary">新增</button>}
+                else
+                {
+                    <button type="submit" class="btn btn-primary">保存</button>
+                }
+                <span class="label label-info">@ViewBag.msg</span>
+            </div>
+        </div>
+    </form>
+</div>

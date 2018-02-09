@@ -1,0 +1,63 @@
+﻿@using Webdiyer.WebControls.Mvc
+@using ManageWeb
+@model ManageDomain.Models.PageModel<ManageDomain.Models.WatchLog.TimeWatch>
+@{
+}
+
+<table class="table table-bordered table-hover">
+    <thead>
+        <tr>
+            <th width="50px;">ID</th>
+            <th width="200px;">日志时间</th>
+            <th width="200px">项目</th>
+            <th width="110px">大分组</th>
+            <th width="110px">小分组</th>
+            <th>标题</th>
+            <th>附加</th>
+            <th>内容</th>
+            @if (ViewBag.ordertype != null)
+            {
+                <th width="80px;">耗时</th>
+            }
+            <th>操作</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var a in Model.list)
+        {
+            <tr>
+                <td>@a.Id</td>
+                <td>@Html.ToDateString(a.CreateTime, "yyyy-MM-dd HH:mm:ss.fff")</td>
+                <td>@a.ProjectName</td>
+                <td>@a.GroupID</td>
+                <td>@a.InnerGroupID</td>
+                <td style="max-width:300px;word-break:break-all;">@a.Title</td>
+                <td style="max-width:300px;word-break:break-all;">@a.Addition</td>
+                <td style="max-width:300px;word-break:break-all;">
+                    <div>
+                        @if (a.Content.Length > 200)
+                        {
+                            <span>@a.Content.Substring(0, 200)+"..."</span>
+                        }
+                        else
+                        {
+                            <span>@a.Content</span>
+                        }
+                    </div>
+                </td>
+                @if (ViewBag.ordertype != null)
+                {
+                    <td>@((a.Elapsed * 1000).ToString("0.000")) ms</td>
+                }
+                <td>
+                    <div class="btn-group btn-group-sm">
+                        @Html.ActionLink("详情", "Detail", new { id = a.Id, date = a.CreateTime.ToString("yyyy-MM-dd HH:mm:ss") }, new { target = "_blank", @class = "btn btn-default" })
+                    </div>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+@Html.Pager(new Webdiyer.WebControls.Mvc.PagedList<object>(Model.list, Model.PageNo, Model.PageSize, Model.TotalCount), new PagerOptions { PageIndexParameterName = "pno", NumericPagerItemCount = 5, ContainerTagName = "ul", CssClass = "pagination", CurrentPagerItemTemplate = "<li class=\"active\"><a href=\"#\">{0}</a></li>", DisabledPagerItemTemplate = "<li class=\"disabled\"><a>{0}</a></li>", PagerItemTemplate = "<li>{0}</li>", Id = "bootstrappager2", PageIndexBoxId = "pageIndexBox", GoToButtonId = "goToBtn" })
+
+

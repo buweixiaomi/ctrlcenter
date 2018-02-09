@@ -1,0 +1,42 @@
+﻿@using Webdiyer.WebControls.Mvc
+@using ManageWeb
+@model ManageDomain.Models.PageModel<ManageDomain.Models.ZhiBoProbation>
+@{
+}
+
+<table class="table table-bordered table-hover">
+    <thead>
+        <tr>
+            <th width="10px;">ID</th>
+            <th width="30px;">姓名</th>
+            <th width="50px;">所属行业</th>
+            <th width="20px;">公司人数</th>
+            <th width="30px;">手机号</th>
+            <th width="20px;"> QQ</th>
+            <th width="30px;">创建时间</th>
+            <td width="80px;">备注</td>
+            <td width="30px;">操作</td>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var a in Model.list)
+        {
+            <tr>
+                <td>@a.ID</td>
+                <td>@a.Name</td>
+                <td>@a.Profession</td>
+                <td>@a.CompanyNum</td>
+                <td>@a.Mobile</td>
+                <td>@a.QQ</td>
+                <td>@Html.ToDateString(a.CreateTime)</td>
+                <td>@a.Remark</td>
+                <td>
+                    <input type="button" class="btn btn-primary" value="备注" onclick="remark(@a.ID)" />
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+@Html.Pager(new Webdiyer.WebControls.Mvc.PagedList<object>(Model.list, Model.PageNo, Model.PageSize, Model.TotalCount), new PagerOptions { PageIndexParameterName = "pno", NumericPagerItemCount = 5, ContainerTagName = "ul", CssClass = "pagination", CurrentPagerItemTemplate = "<li class=\"active\"><a href=\"#\">{0}</a></li>", DisabledPagerItemTemplate = "<li class=\"disabled\"><a>{0}</a></li>", PagerItemTemplate = "<li>{0}</li>", Id = "bootstrappager2", PageIndexBoxId = "pageIndexBox", GoToButtonId = "goToBtn" })
+
+

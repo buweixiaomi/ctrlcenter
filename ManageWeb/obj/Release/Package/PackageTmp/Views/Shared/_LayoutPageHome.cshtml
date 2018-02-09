@@ -1,0 +1,48 @@
+﻿@using ManageWeb
+<!DOCTYPE html>
+@{
+    string urlkey = this.UrlKey();
+}
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>@ViewBag.Title</title>
+    <link href="~/Content/bootstrap.css?v=20161216" rel="stylesheet" />
+    <link href="~/Content/bootstrap-theme.css" rel="stylesheet" />
+    <link href="~/Scripts/DatePicker/skin/WdatePicker.css" rel="stylesheet" />
+    <link href="~/Content/main.css?v=20161216" rel="stylesheet" />
+    <script src="~/Scripts/jquery-1.9.1.js"></script>
+    <script src="~/Scripts/bootstrap.js"></script>
+    <script src="~/Scripts/DatePicker/WdatePicker.js"></script>
+    <script src="~/Scripts/ckeditorfull/ckeditor.js"></script>
+    <script src="~/Scripts/main.js"></script>
+    <style type="text/css">
+    </style>
+    <script type="text/javascript">
+    </script>
+    @RenderSection("Head", false)
+</head>
+<body>
+    <div class="wrapper-header">
+        <a href="/" class="header-title">客户管理控制中心</a>
+        <div class="cc-login-info">
+            @if (User.Identity.IsAuthenticated)
+            {
+                <a href="/account/profile" class="btn btn-success">
+                    <span class="glyphicon glyphicon-user"></span>@ManageDomain.Pub.CurrUserName()
+                </a>
+                <a href="/account/logout" class="btn btn-danger"><span class="glyphicon glyphicon-off"></span></a>
+
+            }
+        </div>
+    </div>
+    <div class="wrapper-center-left">
+        @ManageWeb.MenuBar.GetUserMenu(urlkey)
+    </div>
+    <div class="wrapper-center">
+        <div class="wrapper-center-content" style="">
+            @RenderBody()
+        </div>
+    </div>
+</body>
+</html>

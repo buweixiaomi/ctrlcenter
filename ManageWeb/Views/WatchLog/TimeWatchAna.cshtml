@@ -1,0 +1,164 @@
+﻿@using Webdiyer.WebControls.Mvc
+@model ManageDomain.Models.PageModel<ManageDomain.Models.WatchLog.TimeWatchAna>
+@{
+    Layout = "~/Views/Shared/_LayoutPageHome.cshtml";
+    var pichours = new List<SelectListItem>();
+    int currhour = ViewBag.hour == null ? -1 : ViewBag.hour;
+    for (int i = 0; i < 24; i++)
+    {
+        pichours.Add(new SelectListItem() { Value = i.ToString(), Text = i.ToString() + "时", Selected = currhour == i });
+    }
+
+    Dictionary<int, string> ordertypekeys = new Dictionary<int, string>();
+    ordertypekeys.Add(10, "次数 低-高");
+    ordertypekeys.Add(11, "次数 高-低");
+    ordertypekeys.Add(20, "总耗时 低-高");
+    ordertypekeys.Add(21, "总耗时 高-低");
+    ordertypekeys.Add(30, "平均耗时 低-高");
+    ordertypekeys.Add(31, "平均耗时 高-低");
+    ordertypekeys.Add(40, "最大耗时 低-高");
+    ordertypekeys.Add(41, "最大耗时 高-低");
+    ordertypekeys.Add(50, "最小耗时 低-高");
+    ordertypekeys.Add(51, "最小耗时 高-低");
+    int ordertype1 = ViewBag.ordertype1 == null ? 11 : ViewBag.ordertype1;
+    int ordertype2 = ViewBag.ordertype2 == null ? 11 : ViewBag.ordertype2;
+
+    var ordertypes1 = new List<SelectListItem>();
+    foreach (var a in ordertypekeys)
+    {
+        ordertypes1.Add(new SelectListItem() { Text = a.Value, Value = a.Key.ToString(), Selected =a.Key == ordertype1 });
+    }
+
+    var ordertypes2 = new List<SelectListItem>();
+    foreach (var a in ordertypekeys)
+    {
+        ordertypes2.Add(new SelectListItem() { Text = a.Value, Value = a.Key.ToString(), Selected = a.Key == ordertype2 });
+    }
+}
+@section Head{
+    <script type="text/javascript">
+        ///<reference path="/scripts/jquery-1.9.1.js" />
+        ///<reference path="/scripts/main.js" />
+        function reana() {
+            var date = $("#date").val();
+            var hour = $("#hour").val();
+
+            if (!date || !hour) {
+                alert('请选择日期时间！');
+                return;
+            }
+
+            $.ajax({
+                url: '/watchlog/buildtimewatchana',
+                data: { date: date, hour: hour },
+                type: 'post',
+                success: function (data) {
+                    if (data.code > 0) {
+                        alert("统计成功！");
+                    } else {
+                        alert(data.msg);
+                    }
+                }
+            });
+        }
+        $(document).ready(function () {
+            $(".egcontent").dblclick(function () {
+                var content = $(this).data('oricontent');
+                content = '<textarea style="width:100%; min-height:320px;">' + content + '</textarea>'
+                libjs.showdialog('查看内容', content, 'ok', function (id) {
+                    libjs.closedialog(id);
+                })
+            });
+        });
+    </script>
+}
+<h2>@ViewBag.Title</h2>
+<div class="cc-content-header">
+    <form class="form-inline" role="form">
+
+        <button type="button" class="btn btn-primary" onclick="reana()">重新统计</button>
+        <div class="form-group form-group-sm">
+            <label for="date">日期</label>
+            <input type="text" class="form-control cc-width-2 cc-display-inline-block" style="width:120px;" id="date" onclick="WdatePicker({ dateFmt: 'yyyy-MM-dd' })" name="date" value="@ViewBag.date">
+        </div>
+        <div class="form-group form-group-sm">
+            <label for="date">小时</label>
+            @Html.DropDownList("hour", pichours, new { @class = "form-control cc-width-2 cc-display-inline-block", style = "width:70px;" })
+        </div>
+
+        <div class="form-group form-group-sm">
+            <label for="date">排序1</label>
+            @Html.DropDownList("ordertype1", ordertypes1, new { @class = "form-control cc-width-2 cc-display-inline-block", style = "width:120px;" })
+        </div>
+
+        <div class="form-group form-group-sm">
+            <label for="date">排序1</label>
+            @Html.DropDownList("ordertype2", ordertypes2, new { @class = "form-control cc-width-2 cc-display-inline-block", style = "width:120px;" })
+        </div>
+        <div class="form-group form-group-sm">
+            <label for="groupid">分组</label>
+            <input type="text" class="form-control" id="groupid" style="width:110px;" value="@ViewBag.groupid" name="groupid" placeholder="" />
+        </div>
+        <div class="form-group form-group-sm">
+            <label for="groupid">次数</label>
+            <input type="text" class="form-control" id="mincount" style="width:60px;" value="@ViewBag.mincount" name="mincount" placeholder="" />
+            <span>到</span>
+            <input type="text" class="form-control" id="maxcount" style="width:60px;" value="@ViewBag.maxcount" name="maxcount" placeholder="" />
+        </div>
+        <div class="form-group form-group-sm">
+            <label for="dbname">库名</label>
+            <input type="text" class="form-control" id="dbname" style="width:130px;" value="@ViewBag.dbname" name="dbname" placeholder="" />
+        </div>
+        <div class="form-group form-group-sm">
+            <label for="pagesize">页大小</label>
+            <input type="text" class="form-control" id="pagesize" style="width:80px;" value="@ViewBag.pagesize" name="pagesize" placeholder="" />
+        </div>
+        <button type="submit" class="btn btn-default">查询</button>
+    </form>
+</div>
+
+<table class="table table-bordered table-hover">
+    <thead>
+        <tr>
+            <th width="50px;">分组ID</th>
+            <th width="100px;">库名</th>
+            <th width="100px;">总次数</th>
+            <th width="100px">总耗时 (ms)</th>
+            <th width="100px">平均耗时 (ms)</th>
+            <th width="100px">最大耗时 (ms)</th>
+            <th width="100px">最小耗时 (ms)</th>
+            <th>内容 (双击查看)</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var a in Model.list)
+        {
+            <tr>
+                <td>@a._groupId</td>
+                <td>@a._dbname</td>
+                <td>@a._count</td>
+                <td>@((a._sum * 1000).ToString("0"))</td>
+                <td>@((a._avg * 1000).ToString("0"))</td>
+                <td>@((a._max * 1000).ToString("0"))</td>
+                <td>@((a._min * 1000).ToString("0"))</td>
+                <td class="egcontent" data-oricontent="@a.egContent">
+                    @if (a.egContent.Length > 200)
+                    {
+                        <span>@a.egContent.Substring(0, 200)+"..."</span>
+                    }
+                    else
+                    {
+                        <span>@a.egContent</span>
+                    }
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+@Html.Pager(new Webdiyer.WebControls.Mvc.PagedList<object>(Model.list, Model.PageNo, Model.PageSize, Model.TotalCount), new PagerOptions { PageIndexParameterName = "pno", NumericPagerItemCount = 5, ContainerTagName = "ul", CssClass = "pagination", CurrentPagerItemTemplate = "<li class=\"active\"><a href=\"#\">{0}</a></li>", DisabledPagerItemTemplate = "<li class=\"disabled\"><a>{0}</a></li>", PagerItemTemplate = "<li>{0}</li>", Id = "bootstrappager2", PageIndexBoxId = "pageIndexBox", GoToButtonId = "goToBtn" })
+
+
+
+
+
+

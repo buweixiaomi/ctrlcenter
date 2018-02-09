@@ -1,0 +1,27 @@
+﻿@using ManageWeb
+<!DOCTYPE html>
+@{
+    string urlkey = this.UrlKey();
+}
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>@ViewBag.Title</title>
+    <link href="~/Content/bootstrap.css?v=20161216" rel="stylesheet" />
+    <link href="~/Content/bootstrap-theme.css" rel="stylesheet" />
+    <link href="~/Scripts/DatePicker/skin/WdatePicker.css" rel="stylesheet" />
+    <link href="~/Content/main.css?v=20161216" rel="stylesheet" />
+    <script src="~/Scripts/jquery-1.9.1.js"></script>
+    <script src="~/Scripts/bootstrap.js"></script>
+    <script src="~/Scripts/DatePicker/WdatePicker.js"></script>
+    <script src="~/Scripts/main.js"></script>
+    <style type="text/css">
+    </style>
+    <script type="text/javascript">
+    </script>
+    @RenderSection("Head", false)
+</head>
+<body>
+    @RenderBody()
+</body>
+</html>

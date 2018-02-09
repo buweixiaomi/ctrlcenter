@@ -1,0 +1,103 @@
+﻿@using Webdiyer.WebControls.Mvc
+@using ManageWeb
+@model ManageDomain.Models.PageModel<ManageDomain.Models.Customer>
+@{
+}
+
+<table class="table table-bordered table-hover" style="min-width:1000px;">
+    <thead>
+        <tr>
+            <th width="50px;">ID</th>
+            <th width="200px">名称</th>
+            <th width="80px;">状态</th>
+            <th width="100px">服务器类型</th>
+            <th width="150px;">域名</th>
+            <th width="200px;">服务器信息</th>
+            <th width="170px">创建时间</th>
+            <th width="150px">服务人员</th>
+            @*<th width="170px;">合同到期时间</th>*@
+            <th width="170px">标签</th>
+            <th>备注</th>
+            <th width="120px">操作</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var a in Model.list)
+        {
+            <tr>
+                <td>@a.CusId</td>
+                <td>@a.CustomerName</td>
+                <td>
+                    @switch (a.State)
+                    {
+                        case 0:
+                    <span class="label label-info">待上线</span>
+                            break;
+                        case 1:
+                    <span class="label label-info">服务中</span>
+                            break;
+                        case 2:
+                    <span class="label label-info">停止服务</span>
+                            break;
+                        default:
+                    <span class="label label-info">未知@(a.State)</span>
+                            break;
+                    }
+                </td>
+
+                <td>
+                    @switch (a.ServerOfType)
+                    {
+                        case 0:
+                    <span class="label label-info">未定</span>
+                            break;
+                        case 1:
+                    <span class="label label-info">公司服务器</span>
+                            break;
+                        case 2:
+                    <span class="label label-info">客户自有</span>
+                            break;
+                        case 3:
+                    <span class="label label-info">复合型</span>
+                            break;
+                        default:
+                    <span class="label label-info">未知@(a.ServerOfType)</span>
+                            break;
+                    }
+                </td>
+                <td>@a.WebDomains</td>
+                <td>@a.ServerRemark</td>
+                <td>
+                    @Html.ToDateString(a.CreateTime) <br />
+                <label>合同到期:</label><br />@Html.ToDateString(a.ContractEndTime, "date")
+            </td>
+
+            <td>
+                @if (a.LinkManagers != null)
+                {
+                    foreach (var b in a.LinkManagers)
+                    {
+                        <p>@b.Title : <span class="text-primary">@b.ManagerName</span></p>
+                    }
+                }
+            </td>
+            <td>
+                @foreach (var tag in ManageDomain.Pub.SplitTags(a.Tag))
+                {
+                    <span class="label label-primary cc-display-inline-block" style="margin-top:2px;">@tag</span><br />
+                }
+            </td>
+            <td>@a.Remark</td>
+            <td>
+                <div class="btn-group btn-group-sm">
+                    @Html.ActionLink("详情", "Edit", new { cusid = a.CusId }, new { @class = "btn btn-default " })
+                    <button class="btn btn-danger" data-id="@a.CusId" onclick="libcustomer.index_delete(this)">删除</button>
+                </div>
+            </td>
+        </tr>
+        }
+    </tbody>
+</table>
+@Html.Pager(new Webdiyer.WebControls.Mvc.PagedList<ManageDomain.Models.Customer>(Model.list, Model.PageNo, Model.PageSize, Model.TotalCount), new PagerOptions { PageIndexParameterName = "pno", NumericPagerItemCount = 5, ContainerTagName = "ul", CssClass = "pagination", CurrentPagerItemTemplate = "<li class=\"active\"><a href=\"#\">{0}</a></li>", DisabledPagerItemTemplate = "<li class=\"disabled\"><a>{0}</a></li>", PagerItemTemplate = "<li>{0}</li>", Id = "bootstrappager2", PageIndexBoxId = "pageIndexBox", GoToButtonId = "goToBtn" })
+
+

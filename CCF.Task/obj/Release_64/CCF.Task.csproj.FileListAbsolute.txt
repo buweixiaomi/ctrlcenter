@@ -1,0 +1,17 @@
+E:\SVN\ControlCenter\project\CCF.Task\bin\Release_64\CCF.Task.dll
+E:\SVN\ControlCenter\project\CCF.Task\bin\Release_64\CCF.Task.pdb
+E:\SVN\ControlCenter\project\CCF.Task\bin\Release_64\Common.Logging.Core.dll
+E:\SVN\ControlCenter\project\CCF.Task\bin\Release_64\Common.Logging.dll
+E:\SVN\ControlCenter\project\CCF.Task\bin\Release_64\ICSharpCode.SharpZipLib.dll
+E:\SVN\ControlCenter\project\CCF.Task\bin\Release_64\Newtonsoft.Json.dll
+E:\SVN\ControlCenter\project\CCF.Task\bin\Release_64\Quartz.dll
+E:\SVN\ControlCenter\project\CCF.Task\bin\Release_64\Common.Logging.pdb
+E:\SVN\ControlCenter\project\CCF.Task\bin\Release_64\Common.Logging.xml
+E:\SVN\ControlCenter\project\CCF.Task\bin\Release_64\Common.Logging.Core.pdb
+E:\SVN\ControlCenter\project\CCF.Task\bin\Release_64\Common.Logging.Core.xml
+E:\SVN\ControlCenter\project\CCF.Task\bin\Release_64\Newtonsoft.Json.xml
+E:\SVN\ControlCenter\project\CCF.Task\bin\Release_64\Quartz.pdb
+E:\SVN\ControlCenter\project\CCF.Task\bin\Release_64\Quartz.xml
+E:\SVN\ControlCenter\project\CCF.Task\obj\Release_64\CCF.Task.csprojResolveAssemblyReference.cache
+E:\SVN\ControlCenter\project\CCF.Task\obj\Release_64\CCF.Task.dll
+E:\SVN\ControlCenter\project\CCF.Task\obj\Release_64\CCF.Task.pdb

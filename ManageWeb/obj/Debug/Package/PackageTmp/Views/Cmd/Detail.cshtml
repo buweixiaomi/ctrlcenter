@@ -1,0 +1,104 @@
+﻿@using ManageWeb
+@model Tuple<ManageDomain.Models.Command, List<ManageDomain.Models.CmdArgument>>
+@{
+    ViewBag.Title = "命令详情-" + Model.Item1.Title;
+    Layout = "~/Views/Shared/_LayoutPageHome.cshtml";
+    ManageDomain.Models.ServerMachine serverinfo = null;
+    if (ViewBag.serverinfo != null)
+    {
+        serverinfo = ViewBag.serverinfo;
+    }
+}
+
+<h2>@ViewBag.Title 
+    <a href="/cmd/index" class="btn btn-primary">返回</a>
+    </h2>
+<div style="max-width:1000px;">
+
+    <table class="table table-bordered cc-width-6">
+        <tbody>
+            <tr>
+                <td><label class="text-primary">序号:</label></td>
+                <td><span>@Model.Item1.CmdId</span></td>
+                <td><label class="text-primary">代码:</label></td>
+                <td><span>@Model.Item1.CodeName</span></td>
+            </tr>
+            <tr>
+                <td><label class="text-primary">标题:</label></td>
+                <td colspan="3">@Model.Item1.Title</td>
+            </tr>
+            <tr>
+                <td><label for="Content" class="text-primary">创建时间</label></td>
+                <td>@Html.ToDateString(Model.Item1.CreateTime)</td>
+                <td>
+                    <label for="Importance" class="text-primary">执行状态</label>
+                </td>
+                <td>
+                    @if (Model.Item1.CompleteState == 0)
+                    {
+                        <span>待执行...</span>
+                    }
+                    else if (Model.Item1.CompleteState == 1)
+                    {
+                        <span>执行中</span>
+                    }
+                    else if (Model.Item1.CompleteState == 2)
+                    {
+                        <span>成功</span>
+                    }
+                    else if (Model.Item1.CompleteState == -1)
+                    {
+                        <span style="color:red;">执行失败</span>
+                    }
+                    else
+                    {
+                        <span>@Model.Item1.CompleteState</span>
+                    }
+                </td>
+            </tr>
+            <tr>
+                <td><label class="text-primary">服务器：</label></td>
+                <td colspan="3">
+                    @if (serverinfo != null)
+                    {
+                        <span>@(serverinfo.ServerName)</span><br />
+                        <span>@(serverinfo.ServerIPs)</span>
+                    }
+                </td>
+            </tr>
+            <tr>
+                <td><label for="EstimateTime" class="text-primary">执行开始时间</label></td>
+                <td>@Html.ToDateString(Model.Item1.PreExecuteTime)</td>
+                <td><label for="Point" class="text-primary">执行完成时间</label></td>
+                <td> @Html.ToDateString(Model.Item1.CompleteTime)</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div>
+        <div>
+            <label></label>
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    参数 （@Model.Item1.CodeName）
+                </div>
+                <div class="panel-body">
+                    <ul class="list-group">
+                        @foreach (var a in Model.Item2)
+                        {
+                            <li class="list-group-item">@a.ArgValue @(a.ContainConfig == 1 ? "[配置参数]" : "")</li>
+                        }
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div>
+            <label>返回结果</label>
+            <div><pre>@Model.Item1.CompleteMessage</pre></div>
+        </div>
+        <div>
+            <label>返回错误</label>
+            <div><pre>@Model.Item1.CompleteError</pre></div>
+        </div>
+    </div>
+</div>

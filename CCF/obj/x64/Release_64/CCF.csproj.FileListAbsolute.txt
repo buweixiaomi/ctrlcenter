@@ -1,0 +1,8 @@
+E:\SVN\ControlCenter\project\CCF\bin\x64\Release_64\CCF.dll
+E:\SVN\ControlCenter\project\CCF\bin\x64\Release_64\CCF.pdb
+E:\SVN\ControlCenter\project\CCF\bin\x64\Release_64\ICSharpCode.SharpZipLib.dll
+E:\SVN\ControlCenter\project\CCF\bin\x64\Release_64\MySql.Data.dll
+E:\SVN\ControlCenter\project\CCF\bin\x64\Release_64\Newtonsoft.Json.dll
+E:\SVN\ControlCenter\project\CCF\bin\x64\Release_64\Newtonsoft.Json.xml
+E:\SVN\ControlCenter\project\CCF\obj\x64\Release_64\CCF.dll
+E:\SVN\ControlCenter\project\CCF\obj\x64\Release_64\CCF.pdb

@@ -1,0 +1,80 @@
+﻿@model ManageDomain.Models.PageModel<Tuple<ManageDomain.Models.ServerProject, ManageDomain.Models.Project, ManageDomain.Models.ServerMachine>>
+@using Webdiyer.WebControls.Mvc
+
+<table class="table table-bordered table-hover">
+    <thead>
+        <tr>
+            <th>编号</th>
+            <th>项目名称</th>
+            <th>客户项目状态</th>
+            <th>标签</th>
+            <th>开发项目信息</th>
+            <th>服务器信息</th>
+            <th>操作</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var a in Model.list)
+        {
+            <tr>
+                <td>@a.Item1.ServerProjectId</td>
+                <td>@a.Item1.Title</td>
+                <td>
+                    @switch (a.Item1.State)
+                    {
+                        case 0:
+                            <span class="label label-info">正常</span>
+                            break;
+                        case 1:
+                        <span class="label label-info">停用</span>
+                            break;
+                    }
+                </td>
+                <td>
+                    @foreach (var tg in ManageDomain.Pub.SplitTags(a.Item1.Tag))
+                    {
+                        <span class="label label-primary">@tg</span>
+                    }
+                </td>
+                <td>
+                    <ul class="cc-list">
+                        <li>
+                            <label>服务器名:</label>
+                            @a.Item3.ServerName
+                            @if (a.Item3.LastHeartTime != null)
+                            {
+                                if (ManageDomain.Pub.IsRigthHeartbeat(a.Item3.LastHeartTime.Value))
+                                {
+                                    <span class="label label-success">心跳正常</span>
+                                }
+                                else
+                                {
+                                    <span class="label label-danger">心跳异常</span>
+                                }
+                            }
+                        </li>
+                        <li><label>IP:</label>@a.Item3.ServerIPs</li>
+                        <li><label>系统信息:</label>@a.Item3.ServerOS</li>
+                    </ul>
+                </td>
+                <td>
+                    <ul class="cc-list">
+                        <li><label>开发项目名称:</label>@a.Item2.Title</li>
+                        <li><label>开发项目代码:</label>@a.Item2.CodeName</li>
+                    </ul>
+                </td>
+                <td>
+                    <div class="btn-group btn-group-sm">
+                        @Html.ActionLink("详情", "edit", new { serverprojectid = a.Item1.ServerProjectId }, new { @class = "btn btn-default" })
+                        <button type="button" class="btn btn-danger" data-item="@a.Item1.ServerProjectId" onclick="deleteserverproject(this)">删除</button>
+                    </div>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@Html.Pager(new Webdiyer.WebControls.Mvc.PagedList<object>(Model.list, Model.PageNo, Model.PageSize, Model.TotalCount), new PagerOptions { PageIndexParameterName = "pno", NumericPagerItemCount = 5, ContainerTagName = "ul", CssClass = "pagination", CurrentPagerItemTemplate = "<li class=\"active\"><a href=\"#\">{0}</a></li>", DisabledPagerItemTemplate = "<li class=\"disabled\"><a>{0}</a></li>", PagerItemTemplate = "<li>{0}</li>", Id = "bootstrappager2", PageIndexBoxId = "pageIndexBox", GoToButtonId = "goToBtn" })
+
+
+

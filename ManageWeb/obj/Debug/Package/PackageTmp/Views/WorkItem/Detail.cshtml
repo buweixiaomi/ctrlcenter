@@ -1,0 +1,244 @@
+﻿@using ManageWeb
+@model ManageDomain.Models.WorkItem
+@{
+    ViewBag.Title = "查看工作任务";
+    Layout = "~/Views/Shared/_LayoutPageHome.cshtml";
+    ManageDomain.Models.WorkItem wokeitem = Model;
+    if (wokeitem == null)
+    {
+        wokeitem = new ManageDomain.Models.WorkItem();
+    }
+    if (wokeitem.Difficulty < 1 || wokeitem.Difficulty > 5)
+    {
+        wokeitem.Difficulty = 3;
+    }
+
+    if (wokeitem.Importance < 1 || wokeitem.Importance > 5)
+    {
+        wokeitem.Importance = 3;
+    }
+
+    ManageDomain.Models.WorkDistribute currdistribute = null;
+
+    foreach (var a in wokeitem.Distributes)
+    {
+        if (a.ManagerId == User.CurrUserId())
+        {
+            currdistribute = a;
+            break;
+        }
+    }
+}
+@section Head{
+<script src="~/Scripts/ckeditor/ckeditor.js"></script>
+<script type="text/javascript">
+    ///<reference path="/scripts/jquery-1.9.1.js" />
+    ///<reference path="/scripts/main.js" />
+    ///<reference path="/Scripts/ckeditor/ckeditor.js" />
+
+    $(document).ready(function () {
+        CKEDITOR.replace('Content', {
+            language: 'zh-cn'
+        });
+        @if (ViewBag.exec != null) { 
+        @(Html.Raw("$('#btn_exec').click();"))
+        }
+
+    });
+</script>
+}
+<h2> 查看工作任务 - @wokeitem.Title;</h2>
+<p>@Html.ActionLink("返回", "Index", null, new { @class = "btn btn-success" })</p>
+<div>
+    <form class="form-horizontal" role="form" method="get">
+        <div class="form-group">
+            <label for="WorkItemId" class="col-sm-2 control-label">工作任务编号</label>
+            <div class="col-sm-10">
+                <input type="text" class="form-control cc-width-2 cc-display-inline-block" name="WorkItemId" id="WorkItemId" disabled value="@wokeitem.WorkItemId">
+                <span>
+                    @switch (wokeitem.State)
+                    {
+                    case 0:
+                    <span class="label label-danger">待处理</span>
+                    break;
+                    case 1:
+                    <span class="label label-warning">处理中</span>
+                    break;
+                    case 2:
+                    <span class="label label-success">处理完成</span>
+                    break;
+                    case -1:
+                    <span class="label label-info">已删除</span>
+                    break;
+                    default:
+                    <span class="label label-info">未知@(wokeitem.State)</span>
+                    break;
+                    }
+
+                    @if ((wokeitem.State == 0 || wokeitem.State == 1) && currdistribute != null)
+                    {
+                    <button class="btn btn-primary" type="button" id="btn_exec" onclick="libworkitem.detail_exec_click()">执行</button>
+                    }
+
+                </span>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="serverName" class="col-sm-2 control-label"></label>
+            <div class="col-sm-10">
+
+
+                <table class="table table-bordered cc-width-6">
+                    <tbody>
+                       <tr>
+                           <td><label class="text-primary">创建时间:</label></td>
+                           <td><span>@Html.ToDateString(wokeitem.CreateTime)</span></td>
+                           <td><label class="text-primary">截止时间:</label></td>
+                           <td><span class="text-warning">@Html.ToDateString(wokeitem.Finaldate)</span></td>
+                       </tr>
+                        <tr>
+                            <td><label class="text-primary">更新时间:</label></td>
+                            <td><span>@Html.ToDateString(wokeitem.UpdateTime)</span></td>
+                            <td><label class="text-primary">提交时间:</label></td>
+                            <td><span>@Html.ToDateString(wokeitem.CommitTime)</span></td>
+                        </tr>
+                        <tr>
+                            <td><label for="Content" class="">难度</label></td>
+                            <td>                                @Html.DropDownList("Difficulty", new List<SelectListItem>() {
+                    new SelectListItem(){ Text = "极简单" ,Value ="1", Selected = wokeitem.Difficulty==1},
+                    new SelectListItem(){ Text = "较简单" ,Value ="2", Selected = wokeitem.Difficulty==2},
+                    new SelectListItem(){ Text = "一般" ,Value ="3", Selected = wokeitem.Difficulty==3},
+                    new SelectListItem(){ Text = "较难" ,Value ="4", Selected = wokeitem.Difficulty==4},
+                    new SelectListItem(){ Text = "极难" ,Value ="5", Selected = wokeitem.Difficulty==5}
+                    }, new { @class = "form-control  cc-width-1-5  cc-display-inline-block", disabled = "disabled" })</td>
+                            <td>
+                                <label for="Importance" class="">重要度</label></td>
+                            <td>                                @Html.DropDownList("Importance", new List<SelectListItem>() {
+                    new SelectListItem(){ Text = "极底" ,Value ="1", Selected = wokeitem.Importance==1},
+                    new SelectListItem(){ Text = "较底" ,Value ="2", Selected = wokeitem.Importance==2},
+                    new SelectListItem(){ Text = "一般" ,Value ="3", Selected = wokeitem.Importance==3},
+                    new SelectListItem(){ Text = "较高" ,Value ="4", Selected = wokeitem.Importance==4},
+                    new SelectListItem(){ Text = "极高" ,Value ="5", Selected = wokeitem.Importance==5}
+                    }, new { @class = "form-control  cc-width-1-5 cc-display-inline-block", disabled = "disabled" })</td>
+                        </tr>
+                        <tr>
+                            <td><label for="EstimateTime" class="">预计用时</label></td>
+                            <td><input type="text" class="form-control cc-width-1-5 cc-display-inline-block" id="EstimateTime" disabled name="EstimateTime" value="@wokeitem.EstimateTime"><span class="">小时</span></td>
+                            <td><label for="Point" class="">实际用时</label></td>
+                            <td> <input type="text" class="form-control cc-width-1-5 cc-display-inline-block" id="Point" disabled name="Point" value="@wokeitem.ActualTime"></td>
+                        </tr>
+                        <tr>
+                            <td><label for="Point" class="">分值</label></td>
+                            <td><input type="text" class="form-control cc-width-1-5 cc-display-inline-block" id="Point" disabled name="Point" value="@wokeitem.Point"><span class="help-block cc-display-inline-block">在0-100之间</span></td>
+                            <td><label for="" class="">标签</label></td>
+                            <td>@foreach (var a in ManageDomain.Pub.SplitTags(wokeitem.Tag))
+                            {
+                                <span class="label label-info">@a</span>
+                            }</td>
+                        </tr>
+                        <tr>
+                            <td><label for="Point" class="">分配人员</label></td>
+                            <td>@if (wokeitem.Distributes != null)
+                            {
+                                foreach (var a in wokeitem.Distributes)
+                                {
+                                    <span class="label label-info">@a.ManagerName</span>
+                                }
+                            }</td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+
+        <div class="form-group">
+            <label for="Title" class="col-sm-2 control-label">分配情况</label>
+            <div class="col-sm-10">
+                <table class="table table-bordered cc-width-6">
+                    <thead>
+                        <tr>
+                            <th>人员</th>
+                            <th>状态</th>
+                            <th>提交时间</th>
+                            <th>说明</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var dis in wokeitem.Distributes)
+                        {
+                        <tr>
+                            <td>@dis.ManagerName</td>
+                            <td>
+                                @switch (dis.State)
+                                {
+                                case 0:
+                                <span class="label label-warning">处理中</span>
+                                break;
+                                case 1:
+                                <span class="label label-success">完成</span>
+                                break;
+                                }
+                            </td>
+                            <td>@Html.ToDateString(dis.CommitTime)</td>
+                            <td>@dis.WorkRemark</td>
+                        </tr>
+
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="Title" class="col-sm-2 control-label">标题</label>
+            <div class="col-sm-10">
+                <textarea class="form-control cc-width-6" rows="2" id="Title" disabled name="Title">@(wokeitem.Title)</textarea>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="Content" class="col-sm-2 control-label">内容描述</label>
+            <div class="col-sm-10">
+                <div class="cc-width-6">
+                    <textarea class="form-control cc-width-6" rows="2" id="Content" disabled>@Html.Raw(wokeitem.Content)</textarea>
+                    <textarea class="form-control cc-width-6" rows="2" id="HideContent" disabled name="Content" style="display:none;">@Html.Raw(wokeitem.Content)</textarea>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="Remark" class="col-sm-2 control-label">备注</label>
+            <div class="col-sm-10">
+                <textarea class="form-control cc-width-6" rows="4" id="Remark" disabled name="Remark">@(wokeitem.Remark)</textarea>
+            </div>
+        </div>
+    </form>
+</div>
+
+<!-- 模态框（Modal） -->
+<div class="modal fade" id="myModal-exec" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                    &times;
+                </button>
+                <h4 class="modal-title" id="myModalLabel">执行工作任务</h4>
+            </div>
+            <div class="modal-body">
+                <p><label>用时：</label><input type="text" class="form-control cc-width-2 cc-display-inline-block" id="exec-actualtime" value="@(currdistribute == null ? "" : currdistribute.ActualTime.ToString())" /><span>小时</span></p>
+                <textarea rows="6" class="form-control" id="exec-content">@(currdistribute == null ? "" : currdistribute.WorkRemark)</textarea>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">
+                    关闭
+                </button>
+                <button type="button" class="btn btn-primary" data-id="@wokeitem.WorkItemId" onclick="libworkitem.detail_exec(this)">提交</button>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal -->
+</div>

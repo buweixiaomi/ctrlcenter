@@ -1,0 +1,174 @@
+﻿@using ManageDomain
+@using ManageWeb
+@model ManageDomain.Models.Project
+@{
+    ViewBag.Title = (Model == null) ? "新增开发项目" : "修改开发项目-[" + Model.ProjectId + " " + Model.Title + "]";
+    Layout = "~/Views/Shared/_LayoutPageHome.cshtml";
+    var model = Model == null ? new ManageDomain.Models.Project() : Model;
+    List<ManageDomain.Models.ProjectConfig> configs = new List<ManageDomain.Models.ProjectConfig>();
+    if (ViewBag.configs != null)
+    {
+        configs = ViewBag.configs;
+    }
+}
+
+@section Head{
+    <script type="text/javascript">
+        function addconfig() {
+            var t = '             <tr>     <td> <input type="text" class="form-control" placeholder="请尽量只使用字母和下划线" name="configkey" value="" />  </td>   ' +
+                       '                 <td>   <input type="text" class="form-control" placeholder="" name="configvalue" value="" /> </td>   ' +
+                       '                 <td> <input type="text" class="form-control" placeholder="" name="configremark" value="" />   </td> ' +
+                       '                 <td> <button type="button" class="btn btn-danger" onclick="deleteconfig(this)">删除</button>  </td>  </tr>';
+            $("#p_proconfig tbody").append(t);
+        }
+        function deleteconfig(e) {
+            if (!confirm('你确定要删除吗(保存后删除生效)？'))
+                return;
+            $(e).parents('tr').remove();
+        }
+
+        function syntocusprojectconfig(id) {
+            if (!confirm("确定同步吗？(没有该参数即添加，已存在不变)"))
+                return;
+            $.ajax({
+                url: '/project/SynConfig',
+                type: 'post',
+                data: { configkey: id },
+                success: function (data) {
+                    alert('同步完成，更新配置数' + data.data);
+                }, error: function () {
+                    alert("网络错误！");
+                }
+            });
+        }
+    </script>
+}
+<h2>@ViewBag.Title @Html.ActionLink("返回", "Index", null, new { @class = "btn btn-success" })</h2>
+@if (model.ProjectId > 0)
+{
+    <div class="btn-group">
+        @Html.ActionLink("编辑", "Edit", new { projectid = Request.QueryString["projectId"] }, new { @class = "btn btn-default active" })
+        @Html.ActionLink("版本", "Version", new { projectid = Request.QueryString["projectId"] }, new { @class = "btn btn-default" })
+    </div>
+}
+<div>
+    <form class="form-horizontal" role="form" method="post">
+        <div class="form-group">
+            <label for="projectId" class="col-sm-2 control-label">项目ID</label>
+            <div class="col-sm-10">
+                @if (model.ProjectId <= 0)
+                {
+                    <input type="text" class="form-control" name="projectId" id="projectId" placeholder="自动生成" readonly="readonly" value=""> }
+                else
+                {
+                    <input type="text" class="form-control" name="projectId" id="projectId" readonly="readonly" value="@(model.ProjectId)">
+                }
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="title" class="col-sm-2 control-label">项目名称</label>
+            <div class="col-sm-10">
+                <input type="text" class="form-control" id="title" name="title" placeholder="请输入项目名称" value="@(model.Title)">
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="codeName" class="col-sm-2 control-label">项目代码</label>
+            <div class="col-sm-10">
+                <input type="text" class="form-control" id="codeName" name="codeName" placeholder="请输入项目代码" value="@(model.CodeName)">
+                <span class="help-block">请尽量只使用字线和下划线</span>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="State" class="col-sm-2 control-label">项目状态</label>
+            <div class="col-sm-10">
+                @Html.DropDownList("State", new List<SelectListItem>() {
+           new SelectListItem(){ Text = "正常" ,Value ="0", Selected = model.State==0},
+           new SelectListItem(){ Text = "停用" ,Value ="1", Selected = model.State==1}
+                    }, new { @class = "form-control" })
+            </div>
+            @*new SelectListItem(){ Text = "删除" ,Value ="-1", Selected = model.State==-1}*@
+        </div>
+
+
+        <div class="form-group">
+            <label for="" class="col-sm-2 control-label">项目配置</label>
+            <div class="col-sm-10">
+                <div class="panel panel-default" style="max-width:800px;">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">
+                            <button type="button" class="btn btn-primary" onclick="addconfig()">增加配置</button>
+                            <label class="label label-primary">DIR</label>
+                            <label class="label label-primary">BACKUP</label>
+                        </h3>
+                    </div>
+                    <table class="table table-bordered" id="p_proconfig">
+                        <thead>
+                            <tr>
+                                <th>参数代码</th>
+                                <th>默认值</th>
+                                <th>备注</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var a in configs)
+                            {
+                                <tr>
+                                    <td>
+                                        <input type="text" class="form-control" placeholder="请尽量只使用字母和下划线" name="configkey" value="@a.ConfigKey">
+                                    </td>
+                                    <td>
+                                        <input type="text" class="form-control" placeholder="" name="configvalue" value="@a.ConfigValue">
+                                    </td>
+                                    <td>
+                                        <input type="text" class="form-control" placeholder="" name="configremark" value="@a.Remark">
+                                    </td>
+                                    <td>
+                                        <button type="button" class="btn btn-danger" onclick="deleteconfig(this)">删除</button>
+                                        <button type="button" class="btn btn-warning" onclick="syntocusprojectconfig('@a.ConfigKey')" title="同步到客户项目，请先保存！">同步</button>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="Remark" class="col-sm-2 control-label">备注</label>
+            <div class="col-sm-10">
+                <textarea class="form-control" rows="3" id="Remark" name="Remark">@(model.Remark)</textarea>
+            </div>
+        </div>
+        @if (model.ProjectId > 0)
+        {
+            <div class="form-group">
+                <label for="serverName" class="col-sm-2 control-label">创建时间</label>
+                <div class="col-sm-10">
+                    <span class="help-block">@(model.CreateTime)</span>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="serverName" class="col-sm-2 control-label">更新时间</label>
+                <div class="col-sm-10">
+                    <span class="help-block">@(model.UpdateTime)</span>
+                </div>
+            </div>
+        }
+        <div class="form-group">
+            <div class="col-sm-offset-2 col-sm-10">
+                @if (model.ProjectId <= 0)
+                {
+                    <button type="submit" class="btn btn-primary">新增</button>}
+                else
+                {
+                    <button type="submit" class="btn btn-primary">保存</button>
+                }
+                <span class="label label-info">@ViewBag.msg</span>
+            </div>
+        </div>
+    </form>
+</div>

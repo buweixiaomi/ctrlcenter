@@ -1,0 +1,109 @@
+﻿@using ManageWeb
+@model ManageDomain.Models.CusService
+@{
+    ViewBag.Title = (Model == null) ? "新增服务记录" : "修改服务记录";
+    Layout = "~/Views/Shared/_LayoutPageHome.cshtml";
+    ManageDomain.Models.CusService service = Model;
+    if (service == null)
+    {
+        service = new ManageDomain.Models.CusService();
+    }
+
+}
+@section Head{
+    <script type="text/javascript">
+        ///<reference path="/scripts/jquery-1.9.1.js" />
+        ///<reference path="/scripts/main.js" />
+
+    </script>
+}
+<h2>编辑客户信息</h2>
+<p>@Html.ActionLink("返回", "Index", null, new { @class = "btn btn-success" })</p>
+<div>
+    <form class="form-horizontal" role="form" method="post">
+        <div class="form-group">
+            <label for="CusId" class="col-sm-2 control-label">客户ID</label>
+            <div class="col-sm-10">
+                <input type="hidden" name="CusId" id="CusId" value="@service.CusId" />
+                <input type="text" class="form-control cc-width-6 cc-display-inline-block" id="Show_CusId" name="Show_CusId" placeholder="请选择客户" readonly="readonly" value="@ViewBag.Show_CusId">
+                <button type="button" class="btn btn-sm" onclick="libcusservice.edit_selectcus()">...</button>
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="Title" class="col-sm-2 control-label">标题</label>
+            <div class="col-sm-10">
+                <input type="text" class="form-control cc-width-6" name="Title" id="Title" placeholder="" value="@service.Title">
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="serviceTime" class="col-sm-2 control-label">服务时间</label>
+            <div class="col-sm-10">
+                <input class="form-control cc-width-2" id="serviceTime" name="serviceTime" value="@Html.ToDateString(service.ServiceTime)" onclick="WdatePicker({ dateFmt: 'yyyy-MM-dd HH:mm:ss' })" />
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="ServiceDesc" class="col-sm-2 control-label">服务内容</label>
+            <div class="col-sm-10">
+                <textarea class="form-control cc-width-6" rows="6" id="ServiceDesc" name="ServiceDesc">@service.ServiceDesc</textarea>
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="serviceMan" class="col-sm-2 control-label">参与人员及工作</label>
+            <div class="col-sm-10">
+                <textarea class="form-control cc-width-6" rows="6" id="serviceMan" name="serviceMan">@service.ServiceMan</textarea>
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="serviceCharge" class="col-sm-2 control-label">服务费</label>
+            <div class="col-sm-10">
+                <input type="text" class="form-control cc-width-4" name="serviceCharge" id="serviceCharge" placeholder="如:199元" value="@service.ServiceCharge">
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="serviceType" class="col-sm-2 control-label">服务类型</label>
+            <div class="col-sm-10">
+                @Html.DropDownList("serviceType", new List<SelectListItem>() {
+                new SelectListItem(){ Text = "默认" ,Value ="0", Selected = service.ServiceType==0},
+                new SelectListItem(){ Text = "Bug修改" ,Value ="1", Selected = service.ServiceType==1},
+                new SelectListItem(){ Text = "功能调整" ,Value ="2", Selected = service.ServiceType==2},
+                new SelectListItem(){ Text = "新需求" ,Value ="3", Selected = service.ServiceType==2}
+                }, new { @class = "form-control  cc-width-3" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="Remark" class="col-sm-2 control-label">备注</label>
+            <div class="col-sm-10">
+                <textarea class="form-control cc-width-6" rows="4" id="Remark" name="Remark">@service.Remark</textarea>
+            </div>
+        </div>
+        @if (service.CreateManagerId > 0)
+        {
+            <div class="form-group">
+                <label for="serverName" class="col-sm-2 control-label">创建时间</label>
+                <div class="col-sm-10">
+                    <span class="help-block">@Html.ToDateString(service.CreateTime)</span>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="serverName" class="col-sm-2 control-label">更新时间</label>
+                <div class="col-sm-10">
+                    <span class="help-block">@service.CreateManagerId @service.CreateManagerName </span>
+                </div>
+            </div>
+        }
+        <div class="form-group">
+            <div class="col-sm-offset-2 col-sm-10">
+                @if (service.CreateManagerId > 0)
+                {
+                    <button type="submit" class="btn btn-primary">保存</button>
+                }
+                else
+                {
+                    <button type="submit" class="btn btn-primary">新增</button>
+                }
+                <span class="label label-info">@ViewBag.msg</span>
+            </div>
+        </div>
+    </form>
+</div>

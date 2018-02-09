@@ -1,0 +1,51 @@
+﻿@{
+    ViewBag.Title = "欢迎使用控制中心";
+    Layout = "~/Views/Shared/_LayoutPageHome.cshtml";
+}
+
+<h2 class="text-center"></h2>
+
+@if (ViewBag.waitworks != null)
+{
+    List<ManageDomain.Models.WorkItem> waitworks = ViewBag.waitworks;
+    <div>
+        <h3>Top5工作任务</h3>
+        @if (waitworks.Count > 0)
+        {
+            foreach (var a in waitworks)
+            {
+                <div class="panel panel-primary cc-display-inline-block cc-width-3">
+                    <div class="panel-heading">@a.CreateTime.ToString("yyyy-MM-dd HH:mm:ss") @a.ManagerName</div>
+                    <div class="panel-body" style="height:120px; overflow-y:auto;">
+                        <p class="text-right"><a href="/workitem/detail?workitemid=@a.WorkItemId"><span class="glyphicon glyphicon-th-large"></span>详情</a></p>
+                        <p class="text-center  text-primary">@a.Title</p>
+                    </div>
+                </div>
+            }
+        }
+        else
+        {
+            <div class="panel panel-primary cc-display-inline-block cc-width-3">
+                <div class="panel-heading">暂时没有工作任务</div>
+                <div class="panel-body" style="height:120px; overflow-y:auto;">
+                    <h4 class="text-center text-warning">每天要喝8杯水,去倒杯水吧 : )</h4>
+                </div>
+            </div>
+        }
+    </div>
+}
+
+@if (ViewBag.addworkdaily != null)
+{
+    <div>
+        <div class="panel panel-primary cc-display-inline-block cc-width-3">
+            <div class="panel-heading">工作日志</div>
+            <div class="panel-body" style="height:120px; overflow-y:auto;">
+                <p class="text-center">
+                    <a  href="/workdaily/add" class="btn btn-primary btn-lg" style="">
+                        <span class="glyphicon glyphicon-plus">添加工作日志</span>
+                    </a></p>
+            </div>
+        </div>
+    </div>
+}

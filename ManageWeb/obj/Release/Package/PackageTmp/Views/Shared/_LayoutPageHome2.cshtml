@@ -1,0 +1,41 @@
+﻿<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>@ViewBag.Title</title>
+    <link href="~/Content/bootstrap.css" rel="stylesheet" />
+    <link href="~/Content/bootstrap-theme.css" rel="stylesheet" />
+    <link href="~/Content/main.css?v=77" rel="stylesheet" />
+    <script src="~/Scripts/jquery-1.9.1.js"></script>
+    <script src="~/Scripts/bootstrap.js"></script>
+    <style type="text/css">
+    </style>
+    <script type="text/javascript">
+    </script>
+    @RenderSection("Head", false)
+</head>
+<body>
+    <div class="wrapper-header">
+        <h3>客户端管理控制中心</h3>
+    </div>
+    <div class="wrapper-center">
+        <div class="wrapper-center-left">
+            <ul class="nav nav-list">
+                <li class="nav-header">客户</li>
+                <li class="active"><a href="/customer/index">客户列表</a></li>
+                <li><a href="/servermachine/index">服务器列表</a></li>
+                <li><a href="/project/index">项目列表</a></li>
+                <li><a href="/cusproject/index">客户项目管理</a></li> 
+                <li><a href="/cmd/operate">命令操作</a></li>
+                <li><a href="/cmd/index">命令列表</a></li>
+            </ul>
+        </div>
+        <div class="wrapper-center-content">
+            @RenderBody()
+        </div>
+    </div>
+    <div class="wrapper-bottom">
+    </div>
+</body>
+</html>

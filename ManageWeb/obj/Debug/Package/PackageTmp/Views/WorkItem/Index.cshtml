@@ -1,0 +1,45 @@
+﻿@model ManageDomain.Models.PageModel<ManageDomain.Models.WorkItem>
+@{
+    ViewBag.Title = "任务列表";
+    Layout = "~/Views/Shared/_LayoutPageHome.cshtml";
+    int? workitemstate = ViewBag.workitemstate;
+    string wsv = workitemstate.ToString();
+    bool isdistome = ViewBag.distributetome;
+}
+@section Head{
+    <script type="text/javascript">
+        ///<reference path="/scripts/jquery-1.9.1.js" />
+        ///<reference path="/scripts/main.js" />
+    </script>
+}
+<h2>工作任务<a href="/workitem/add" class="btn btn-primary">新增</a></h2>
+<div class="cc-content-header">
+    <form class="form-inline" role="form">
+        <div class="form-group">
+            <label for="distributeuserid">指派给</label>
+            <input type="text" class="form-control" id="distributeuserid" value="@ViewBag.distributeuserid" name="distributeuserid" placeholder="" />
+            <button type="button" class="btn btn-sm" onclick="libworkitem.index_selectmanager1()">...</button>
+        </div>
+        <div class="form-group">
+            <label for="createuserid">创建人</label>
+            <input type="text" class="form-control" id="createuserid" value="@ViewBag.createuserid" name="createuserid" placeholder="" />
+            <button type="button" class="btn btn-sm" onclick="libworkitem.index_selectmanager2()">...</button>
+        </div>
+        <div class="form-group">
+            <label for="workitemstate">任务状态</label>
+            @Html.DropDownList("workitemstate", new List<SelectListItem>() { 
+       new SelectListItem(){ Text = "所有状态", Value = "", Selected =wsv=="" },
+       new SelectListItem(){ Text = "待处理", Value = "0", Selected =wsv=="0" },
+       new SelectListItem(){ Text = "处理中", Value = "1", Selected =wsv=="1" },
+       new SelectListItem(){ Text = "处理完成", Value = "2", Selected =wsv=="2" },
+       }, new { @class = "form-control  cc-display-inline-block cc-width-1" })
+             </div>
+        <div class="form-group">
+            <input type="checkbox" style="width:25px; height:25px;" name="distributetome" id="distributetome"  @(isdistome ? "checked=\"checked\"" : "") />
+            <label for="distributetome">指派给我的</label>
+        </div>
+        <button type="submit" class="btn btn-default">查询</button>
+    </form>
+</div>
+@Html.Partial("Index_Sub", Model)
+

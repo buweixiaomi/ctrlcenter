@@ -1,0 +1,9 @@
+E:\SVN\ControlCenter\project\TaskDemo\bin\Release\TaskDemo.dll
+E:\SVN\ControlCenter\project\TaskDemo\bin\Release\TaskDemo.pdb
+E:\SVN\ControlCenter\project\TaskDemo\bin\Release\CCF.Task.dll
+E:\SVN\ControlCenter\project\TaskDemo\bin\Release\Newtonsoft.Json.dll
+E:\SVN\ControlCenter\project\TaskDemo\bin\Release\CCF.Task.pdb
+E:\SVN\ControlCenter\project\TaskDemo\bin\Release\Newtonsoft.Json.xml
+E:\SVN\ControlCenter\project\TaskDemo\obj\Release\TaskDemo.csprojResolveAssemblyReference.cache
+E:\SVN\ControlCenter\project\TaskDemo\obj\Release\TaskDemo.dll
+E:\SVN\ControlCenter\project\TaskDemo\obj\Release\TaskDemo.pdb

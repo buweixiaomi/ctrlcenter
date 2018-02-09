@@ -1,0 +1,57 @@
+﻿@using Webdiyer.WebControls.Mvc
+@using ManageWeb
+@model ManageDomain.Models.PageModel<ManageDomain.Models.ServerWatch.ServerStateInfo>
+@{
+}
+
+<table class="table table-bordered table-hover">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>名称</th>
+            <th>IP</th>
+            <th width="250px">上次心跳时间</th>
+            <th>性能概要</th>
+            <th>性能数据更新时间</th>
+            <th>操作</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var a in Model.list)
+        {
+            <tr>
+                <td>@a.Server.ServerId</td>
+                <td>@a.Server.ServerName</td>
+                <td>@a.Server.ServerIPs</td>
+                <td>
+                   <p class="text-center">@Html.ToDateString(a.Server.LastHeartTime)</p> 
+                    <p class="text-center">
+                        @{
+            if (a.Server.LastHeartTime != null)
+            {
+                if (ManageDomain.Pub.IsRigthHeartbeat(a.Server.LastHeartTime.Value))
+                {
+                    <span class="label label-success">心跳正常</span>
+                }
+                else
+                {
+                    <span class="label label-danger">心跳异常</span>
+                }
+            }
+                        }
+                    </p>
+                </td>
+                <td style="max-width:300px;">@a.StateInfo</td>
+                <td>@Html.ToDateString(a.UpdateTime)</td>
+                <td>
+                    <div class="btn-group btn-group-sm">
+                        @Html.ActionLink("性能详情", "Detail", new { serverid = a.Server.ServerId }, new { @class = "btn btn-default" })
+                    </div>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+@Html.Pager(new Webdiyer.WebControls.Mvc.PagedList<object>(Model.list, Model.PageNo, Model.PageSize, Model.TotalCount), new PagerOptions { PageIndexParameterName = "pno", NumericPagerItemCount = 5, ContainerTagName = "ul", CssClass = "pagination", CurrentPagerItemTemplate = "<li class=\"active\"><a href=\"#\">{0}</a></li>", DisabledPagerItemTemplate = "<li class=\"disabled\"><a>{0}</a></li>", PagerItemTemplate = "<li>{0}</li>", Id = "bootstrappager2", PageIndexBoxId = "pageIndexBox", GoToButtonId = "goToBtn" })
+
+

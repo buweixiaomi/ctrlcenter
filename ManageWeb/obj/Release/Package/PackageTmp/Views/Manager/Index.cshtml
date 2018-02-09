@@ -1,0 +1,15 @@
+﻿@model ManageDomain.Models.PageModel<ManageDomain.Models.Manager>
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_LayoutPageHome.cshtml";
+}
+@section Head{
+    <script type="text/javascript">
+    </script>
+}
+<h2>员工管理</h2>
+<div>
+    <a href="/manager/edit" class="btn btn-primary">新增员工</a>
+</div>
+@Html.Partial("Index_Sub", Model)
+

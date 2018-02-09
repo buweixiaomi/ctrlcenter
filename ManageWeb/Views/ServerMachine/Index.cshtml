@@ -1,0 +1,49 @@
+﻿@model ManageDomain.Models.PageModel<ManageDomain.Models.ServerMachine>
+@{
+    ViewBag.Title = "服务器列表";
+    Layout = "~/Views/Shared/_LayoutPageHome.cshtml";
+}
+@section Head{
+    <script src="~/Scripts/jquery-1.9.1.js"></script>
+    <script type="text/javascript">
+
+        function deleteserver(e) {
+            if (!confirm("你确定要删除吗？"))
+                return;
+            var serverid = $(e).data("item");
+            $.ajax({
+                url: '/servermachine/delete',
+                data: { serverid: serverid },
+                type: 'post',
+                success: function (data) {
+                    if (data.code > 0) {
+                        alert("删除成功！");
+                        location.reload();
+                    }
+                    else {
+                        alert(data.msg);
+                    }
+                },
+                error: function () {
+                    alert("网络或服务器出错！");
+                }
+            });
+        }
+
+    </script>
+}
+<h2>@ViewBag.Title</h2>
+<div>
+    <a href="/servermachine/edit" class="btn btn-primary">新增服务器</a>
+</div>
+<div class="cc-content-header">
+    <form class="form-inline" role="form">
+        <div class="form-group">
+            <label for="search_keywords">关键字</label>
+            <input type="text" class="form-control" id="search_keywords" value="@ViewBag.keywords" name="keywords" placeholder="搜索关键字" />
+        </div>
+        <button type="submit" class="btn btn-default">查询</button>
+    </form>
+</div>
+@Html.Partial("Index_Sub", Model)
+

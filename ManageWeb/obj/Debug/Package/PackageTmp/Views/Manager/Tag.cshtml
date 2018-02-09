@@ -1,0 +1,142 @@
+﻿@model ManageDomain.Models.PageModel<ManageDomain.Models.Manager>
+@{
+    ViewBag.Title = "分组标签管理";
+    Layout = "~/Views/Shared/_LayoutPageHome.cshtml";
+    List<ManageDomain.Models.UserTag> alltags = ViewBag.alltags;
+}
+@section Head{
+    <script type="text/javascript">
+        ///<reference path="/scripts/jquery-1.9.1.js" />
+        ///<reference path="/scripts/main.js" />
+        function postaddtag() {
+            if (!($("#Tag").val())) {
+                alert("标签名称不能为空！");
+                return;
+            }
+            $.ajax({
+                url: '/manager/addusertag',
+                type: 'post',
+                data: $("#addtagform").serialize(),
+                success: function (data) {
+                    if (data.code > 0) {
+                        $("#addtagform input").val("");
+                        alert('添加成功！');
+                        location.reload();
+                    } else {
+                        alert(data.msg);
+                    }
+                }
+            });
+        }
+
+        function deletetag(id) {
+            if (!confirm("确定要删除吗？")) {
+                return;
+            }
+            $.ajax({
+                url: '/manager/deleteusertag',
+                type: 'post',
+                data: { usertagid: id },
+                success: function (data) {
+                    if (data.code > 0) {
+                        alert('删除成功！');
+                        location.reload();
+                    } else {
+                        alert(data.msg);
+                    }
+                }
+            });
+        }
+
+        function tagpermission(id) {
+            $.ajax({
+                url: '/manager/TagPermission',
+                data: { usertagid: id },
+                type: 'post',
+                success: function (html) {
+                   var diaid = libjs.showdialog("编辑权限", html, "保存", function () {
+                        var data = [];
+                        data.push({
+                            name: 'usertagid',
+                            value: id
+                        });
+                        $(".permissionkey:checked").each(function () {
+                            data.push({
+                                name: 'keys',
+                                value: $(this).data("key"),
+                            });
+                        });
+                        $.ajax({
+                            url: '/manager/saveTagPermission',
+                            data: data,
+                            type: 'post',
+                            success: function (data) {
+                                if (data.code > 0) {
+                                    alert('保存成功');
+                                    libjs.closedialog(diaid);
+                                } else {
+                                    alert(data.msg);
+                                }
+                            }
+                        });
+                    })
+                }
+            });
+        }
+
+    </script>
+}
+<h2>分组标签管理</h2>
+
+<div>
+    <form class="form-horizontal" role="form" id="addtagform" method="post">
+        <div class="form-group">
+            <label for="Tag" class="col-sm-2 control-label">标签名称</label>
+            <div class="col-sm-10">
+                <input type="text" class="form-control cc-width-4" name="Tag" id="Tag" value="">
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="remark" class="col-sm-2 control-label">说明</label>
+            <div class="col-sm-10">
+                <input type="text" class="form-control cc-width-4" name="remark" id="remark" value="">
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-sm-offset-2 col-sm-10">
+                <button type="button" onclick="postaddtag()" class="btn btn-primary">新增</button>
+                @*<span class="label label-info" id="addtagresult"></span>*@
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="remark" class="col-sm-2 control-label"></label>
+            <div class="col-sm-10">
+                <h2>标签列表</h2>
+                <div>
+                    <table class="table table-bordered cc-width-6" id="tb_tag">
+                        <tbody>
+                            @foreach (var a in alltags)
+                            {
+                                <tr>
+                                    <td>
+                                        <input type="hidden" class="tag" value="@a.UserTagId" />
+                                        <span class="label label-primary">@a.Tag</span>
+                                    </td>
+                                    <td>
+                                        @a.Remark
+                                    </td>
+                                    <td>
+                                        <div class="btn-group btn-group-sm">
+                                            <button type="button" class="btn btn-primary" onclick="tagpermission('@a.UserTagId')">权限</button>
+                                            <button type="button" class="btn btn-danger" onclick="deletetag('@a.UserTagId')">删除</button></div>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>

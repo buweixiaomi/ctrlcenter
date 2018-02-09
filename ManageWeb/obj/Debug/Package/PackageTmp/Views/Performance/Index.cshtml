@@ -1,0 +1,23 @@
+﻿@model ManageDomain.Models.PageModel<ManageDomain.Models.ServerWatch.ServerStateInfo>
+@{
+    ViewBag.Title = "性能服务器列表";
+    Layout = "~/Views/Shared/_LayoutPageHome.cshtml";
+}
+@section Head{
+    <script src="~/Scripts/jquery-1.9.1.js"></script>
+    <script type="text/javascript">
+         
+    </script>
+}
+<h2>@ViewBag.Title</h2> 
+<div class="cc-content-header">
+    <form class="form-inline" role="form">
+        <div class="form-group">
+            <label for="search_keywords">关键字</label>
+            <input type="text" class="form-control" id="search_keywords" value="@ViewBag.keywords" name="keywords" placeholder="搜索关键字" />
+        </div>
+        <button type="submit" class="btn btn-default">查询</button>
+    </form>
+</div>
+@Html.Partial("Index_Sub", Model)
+

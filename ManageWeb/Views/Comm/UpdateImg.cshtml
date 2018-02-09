@@ -1,0 +1,21 @@
+﻿@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>UpLoad</title>
+    <script type="text/javascript">
+        var jsondata = @Html.Raw(ViewBag.jsondata)
+        window.parent.CKEDITOR.tools.callFunction(jsondata.code, jsondata.data, jsondata.msg);
+    </script>
+</head>
+<body>
+    <div>
+
+    </div>
+</body>
+</html>

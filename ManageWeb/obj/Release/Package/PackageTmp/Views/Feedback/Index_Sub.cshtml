@@ -1,0 +1,107 @@
+﻿@using Webdiyer.WebControls.Mvc
+@using ManageWeb
+@model ManageDomain.Models.PageModel<ManageDomain.Models.Feedback>
+@{
+}
+
+<table class="table table-bordered table-hover">
+    <thead>
+        <tr>
+            <th width="50px;">ID</th>
+            <th>标题</th>
+            <th width="80px;">状态</th>
+            <th>客户名称</th>
+            <th>反馈类型</th>
+            <th>反馈来源</th>
+            <th>创建时间</th>
+            <th>创建人</th>
+            <th>审核人</th>
+            <th>审核说明</th>
+            <th>审核时间</th>
+            <th>备注</th>
+            <th>操作</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var a in Model.list)
+        {
+            <tr>
+                <td>@a.FeedbackId</td>
+                <td>@a.Title</td>
+                <td>
+                    @switch (a.State)
+                    {
+                        case -1:
+                            <span class="label label-info">已删除</span>
+                            break;
+                        case 0:
+                        <span class="label label-warning">待审核</span>
+                            break;
+                        case 1:
+                        <span class="label label-info">不予处理</span>
+                            break;
+                        case 2:
+                        <span class="label label-primary">处理中</span>
+                            break;
+                        default:
+                        <span class="label label-info">已完成</span>
+                            break;
+                    }
+                </td>
+                <td>@a.CusName</td>
+                <td>
+                    @switch (a.FeedbackType)
+                    {
+                        case 1:
+                            <span class="label label-info">Bug</span>
+                            break;
+
+                        case 2:
+                        <span class="label label-info">新需求</span>
+                            break;
+                        case 3:
+                        <span class="label label-info">功能调整</span>
+                            break;
+                        case 4:
+                        <span class="label label-info">建议</span>
+                            break;
+                        default:
+                        <span class="label label-info">其他问题</span>
+                            break;
+                    }
+                </td>
+                <td>
+                    @switch (a.FromSource)
+                    {
+                        case 0:
+                            <span class="label label-info">后台添加</span>
+                            break;
+                        default:
+                        <span class="label label-info">客户反馈</span>
+                            break;
+                    }
+                </td>
+                <td>@Html.ToDateString(a.CreateTime)</td>
+                <td>@a.ManagerName</td>
+                <td>@a.CheckManagerName</td>
+                <td>@a.CheckRemark</td>
+                <td>@Html.ToDateString(a.CheckTime)</td>
+                <td>@a.Remark</td>
+                <td>
+                    <div class="btn-group btn-group-sm">
+                        @Html.ActionLink("详情", "Detail", new { feedbackid = a.FeedbackId }, new { @class = "btn btn-sm btn-default" })
+                        @if (a.State == 0)
+                        {
+                            <button type="button" class="btn btn-danger" data-id="@a.FeedbackId" onclick="deletefeedback(this)">删除</button>
+                            <button type="button" class="btn btn-primary" data-id="@a.FeedbackId" onclick="libfeedback.index_precheck(this)">审核</button>
+                        }
+                    </div>
+                </td>
+            </tr>
+        }
+
+    </tbody>
+</table>
+@Html.Pager(new Webdiyer.WebControls.Mvc.PagedList<object>(Model.list, Model.PageNo, Model.PageSize, Model.TotalCount), new PagerOptions { PageIndexParameterName = "pno", NumericPagerItemCount = 5, ContainerTagName = "ul", CssClass = "pagination", CurrentPagerItemTemplate = "<li class=\"active\"><a href=\"#\">{0}</a></li>", DisabledPagerItemTemplate = "<li class=\"disabled\"><a>{0}</a></li>", PagerItemTemplate = "<li>{0}</li>", Id = "bootstrappager2", PageIndexBoxId = "pageIndexBox", GoToButtonId = "goToBtn" })
+
+

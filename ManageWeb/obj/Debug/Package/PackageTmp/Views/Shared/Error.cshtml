@@ -1,0 +1,63 @@
+﻿@model Exception
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>出错</title>
+    <link href="~/Content/bootstrap.css" rel="stylesheet" />
+    <link href="~/Content/bootstrap-theme.css" rel="stylesheet" />
+    <link href="~/Content/main.css" rel="stylesheet" />
+    <script src="~/Scripts/jquery-1.9.1.js"></script>
+    <script src="~/Scripts/jquery-1.9.1.intellisense.js"></script>
+    <script src="~/Scripts/bootstrap.js"></script>
+    <style type="text/css">
+    </style>
+    <script type="text/javascript">
+    </script>
+</head>
+<body>
+    <div class="container" style="margin-top:100px;">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="panel panel-primary">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">提示</h3>
+                    </div>
+                    <div class="panel-body">
+                        @if (ManageDomain.PermissionProvider.ExistWidthCache(ManageDomain.SystemPermissionKey.ShowWebException))
+                        {
+                            <h3>@Model.Message</h3>
+                            <p class="text-info">@Model.StackTrace</p>
+                        }
+                        else
+                        {
+                            if (Model is ManageDomain.MException)
+                            {
+                                <h3><span class="glyphicon glyphicon-alert"></span> @Model.Message</h3>
+                                <p class="text-info">请与管理员联系</p>
+                            }
+                            else
+                            {
+                                <h3>服务器或程序出现问题</h3>
+                                <p class="text-info">请尝试重试或与管理员联系</p>
+                                <div style="display:none;">
+                                    <p>@Model.Message</p>
+                                    <p class="text-info">@Model.StackTrace</p>
+                                </div>
+                            }
+                        }
+                        <p class="text-right">
+                            <button class="btn btn-primary" onclick="history.go(-1)">返回</button>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

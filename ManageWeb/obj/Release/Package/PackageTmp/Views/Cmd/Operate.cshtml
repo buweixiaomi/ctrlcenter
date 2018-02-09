@@ -1,0 +1,380 @@
+﻿@{
+    ViewBag.Title = "命令操作";
+    Layout = "~/Views/Shared/_LayoutPageHome.cshtml";
+}
+@section Head{
+    <script type="text/javascript">
+        ///<reference path="/scripts/jquery-1.9.1.js" />
+        ///<reference path="/scripts/main.js" />
+        function project_tag_click(e) {
+            if ($(e).hasClass("label-default")) {
+                $(e).removeClass('label-default');
+                $(e).addClass('label-primary');
+            }
+            else {
+                $(e).addClass('label-default');
+                $(e).removeClass('label-primary');
+            }
+        }
+
+        //发布
+        function cmd_publish() {
+            var serverprojectids = "";
+            $('#form_publish_serverprojects .serverproitem:checked').each(function () {
+                serverprojectids += $(this).data("id") + ",";
+            });
+            $.ajax({
+                url: '/cmd/submitpublish',
+                type: 'post',
+                data: {
+                    projectid: $("#form_publish #form_publish_projectid").val(),
+                    versionid: $("#form_publish #form_publish_versionid").val(),
+                    serverprojectids: serverprojectids
+                },
+                success: function (data) {
+                    if (data.code > 0) {
+                        alert(data.msg);
+                    } else {
+                        alert(data.msg);
+                    }
+                }
+            });
+        }
+        function project_publish_getserverprojects() {
+            var pid = $("#form_publish_projectid").val();
+            libjs.getserverproject(pid, "#form_publish_serverprojects", "");
+        }
+        function project_publish_select_project() {
+            libjs.showselect("project", function (ty, text, val) {
+                $("#form_publish_projectid").val(val);
+                $("#form_publish_show_projectid").text(val + " - " + text);
+            });
+        }
+        function project_publish_select_version() {
+            var pid = $("#form_publish_projectid").val();
+            if (!pid)
+                return;
+            libjs.showselect("projectversion", function (ty, text, val) {
+                $("#form_publish_versionid").val(val);
+                $("#form_publish_show_versionid").text(val + " - " + text);
+            }, { projectid: pid });
+        }
+
+        //备份
+        function cmd_backupproject() {
+            var serverprojectids = "";
+            $('#form_projectbackup_serverprojects .serverproitem:checked').each(function () {
+                serverprojectids += $(this).data("id") + ",";
+            });
+            $.ajax({
+                url: '/cmd/submitbackupproject',
+                type: 'post',
+                data: {
+                    projectid: $("#form_projectbackup #form_projectbackup_projectid").val(),
+                    serverprojectids: serverprojectids
+                },
+                success: function (data) {
+                    if (data.code > 0) {
+                        alert(data.msg);
+                    } else {
+                        alert(data.msg);
+                    }
+                }
+            });
+        }
+        function project_backupproject_getserverprojects() {
+            var pid = $("#form_projectbackup_projectid").val();
+            libjs.getserverproject(pid, "#form_projectbackup_serverprojects", "");
+        }
+        function project_backupproject_select_project() {
+            libjs.showselect("project", function (ty, text, val) {
+                $("#form_projectbackup_projectid").val(val);
+                $("#form_projectbackup_show_projectid").text(val + " - " + text);
+            });
+        }
+
+        //回退
+        function cmd_rollbackproject() {
+            var serverprojectids = "";
+            $('#form_projectrollback_serverprojects .serverproitem:checked').each(function () {
+                serverprojectids += $(this).data("id") + ",";
+            });
+            $.ajax({
+                url: '/cmd/submitrollbackproject',
+                type: 'post',
+                data: {
+                    projectid: $("#form_projectrollback_projectid").val(),
+                    serverprojectids: serverprojectids
+                },
+                success: function (data) {
+                    if (data.code > 0) {
+                        alert(data.msg);
+                    } else {
+                        alert(data.msg);
+                    }
+                }
+            });
+        }
+        function project_rollbackproject_getserverprojects() {
+            var pid = $("#form_projectrollback_projectid").val();
+            libjs.getserverproject(pid, "#form_projectrollback_serverprojects", '');
+        }
+        function project_rollbackproject_select_project() {
+            libjs.showselect("project", function (ty, text, val) {
+                $("#form_projectrollback_projectid").val(val);
+                $("#form_projectrollback_show_projectid").text(val + " - " + text);
+            });
+        }
+
+        //更新配置
+        function configupdate_getservers() {
+            libjs.getservers("#form_configupdate_servers");
+        }
+
+        function cmd_updateconfig() {
+            var serverids = "";
+            $('#form_configupdate_servers .container_servers:checked').each(function () {
+                serverids += $(this).data("id") + ",";
+            });
+            $.ajax({
+                url: '/cmd/submitupdateconfig',
+                type: 'post',
+                data: {
+                    serverids: serverids
+                },
+                success: function (data) {
+                    if (data.code > 0) {
+                        alert(data.msg);
+                    } else {
+                        alert(data.msg);
+                    }
+                }
+            });
+        }
+
+        //执行CMD
+        function executecmd_getservers() {
+            libjs.getservers("#form_executecmd_servers");
+        }
+
+        function cmd_executecmd() {
+            var serverids = "";
+            $('#form_executecmd_servers .container_servers:checked').each(function () {
+                serverids += $(this).data("id") + ",";
+            });
+            $.ajax({
+                url: '/cmd/submitexeccmd',
+                type: 'post',
+                data: {
+                    cmdline: $("#form_executecmd_cmdline").val(),
+                    serverids: serverids
+                },
+                success: function (data) {
+                    if (data.code > 0) {
+                        alert(data.msg);
+                    } else {
+                        alert(data.msg);
+                    }
+                }
+            });
+        }
+    </script>
+}
+<h2>命令操作</h2>
+<div>
+    <ul id="myTab" class="nav nav-tabs">
+        <li class="dropdown">
+            <a href="#" id="myTabDrop_project" class="dropdown-toggle"
+               data-toggle="dropdown">
+                项目命令
+                <b class="caret"></b>
+            </a>
+            <ul class="dropdown-menu" role="menu" aria-labelledby="myTabDrop_project">
+                <li><a href="#project_publish" tabindex="-1" data-toggle="tab">发布</a></li>
+                <li><a href="#project_backup" tabindex="-1" data-toggle="tab">备份</a></li>
+                <li><a href="#project_rollback" tabindex="-1" data-toggle="tab">回退上一版本</a></li>
+            </ul>
+        </li>
+        <li><a href="#config_update" data-toggle="tab">配置命令</a></li>
+        <li><a href="#execute_cmd" data-toggle="tab">执行CMD</a></li>
+    </ul>
+    <div id="myTabContent" class="tab-content">
+        <div class="tab-pane fade in" id="project_publish">
+            <h2>发布项目</h2>
+            <form class="form-horizontal" role="form" id="form_publish">
+                <div class="form-group">
+                    <label for="form_publish_projectid" class="col-sm-2 control-label">项目</label>
+                    <div class="col-sm-10">
+                        <button type="button" class="btn btn-default" onclick="project_publish_select_project()">选择项目</button>
+                        <input type="hidden" class="form-control" id="form_publish_projectid" name="form_publish_projectid" value="">
+                        <span id="form_publish_show_projectid">请选择</span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="form_publish_versionid" class="col-sm-2 control-label">项目版本</label>
+                    <div class="col-sm-10">
+                        <button type="button" class="btn btn-default" onclick="project_publish_select_version()">选择版本</button>
+                        <input type="hidden" class="form-control" id="form_publish_versionid" name="form_publish_versionid" value="">
+                        <span id="form_publish_show_versionid">请选择</span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="lastname" class="col-sm-2 control-label">选择服务器项目</label>
+                    <div class="col-sm-10">
+                        <div><button type="button" class="btn btn-default" onclick="project_publish_getserverprojects()">得到服务器项目</button></div>
+                        <div class="panel panel-primary" style="width:400px;">
+                            <div class="panel-heading">
+                                <h3 class="panel-title">选择服务器项目</h3>
+                            </div>
+                            <div class="panel-body" id="form_publish_serverprojects">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-sm-offset-2 col-sm-10">
+                        <button type="button" class="btn btn-primary" onclick="cmd_publish()">确定发布</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="tab-pane fade in" id="project_backup">
+            <h2>备份项目</h2>
+            <form class="form-horizontal" role="form" id="form_projectbackup">
+                <div class="form-group">
+                    <label for="codeName" class="col-sm-2 control-label">项目</label>
+                    <div class="col-sm-10">
+                        <button type="button" class="btn btn-default" onclick="project_backupproject_select_project()">选择项目</button>
+                        <input type="hidden" class="form-control" id="form_projectbackup_projectid" name="form_projectbackup_projectid" value="">
+                        <span id="form_projectbackup_show_projectid">请选择</span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="lastname" class="col-sm-2 control-label">选择服务器项目</label>
+                    <div class="col-sm-10">
+                        <div><button type="button" class="btn btn-default" onclick="project_backupproject_getserverprojects()">得到服务器项目</button></div>
+                        <div class="panel panel-primary" style="width:400px;">
+                            <div class="panel-heading">
+                                <h3 class="panel-title">选择客户项目</h3>
+                            </div>
+                            <div class="panel-body" id="form_projectbackup_serverprojects">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-sm-offset-2 col-sm-10">
+                        <button type="button" class="btn btn-primary" onclick="cmd_backupproject()">确定发布</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="tab-pane fade in" id="project_rollback">
+            <h2>回退项目</h2>
+            <form class="form-horizontal" role="form" id="form_projectrollback">
+                <div class="form-group">
+                    <label for="codeName" class="col-sm-2 control-label">项目</label>
+                    <div class="col-sm-10">
+                        <button type="button" class="btn btn-default" onclick="project_rollbackproject_select_project()">选择项目</button>
+                        <input type="hidden" class="form-control" id="form_projectrollback_projectid" name="form_projectrollback_projectid" value="">
+                        <span id="form_projectrollback_show_projectid">请选择</span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="lastname" class="col-sm-2 control-label">选择服务器项目</label>
+                    <div class="col-sm-10">
+                        <div><button type="button" class="btn btn-default" onclick="project_rollbackproject_getserverprojects()">得到服务器项目</button></div>
+                        <div class="panel panel-primary" style="width:400px;">
+                            <div class="panel-heading">
+                                <h3 class="panel-title">选择客户项目</h3>
+                            </div>
+                            <div class="panel-body" id="form_projectrollback_serverprojects">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-sm-offset-2 col-sm-10">
+                        <button type="button" class="btn btn-primary" onclick="cmd_rollbackproject()">确定发布</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+
+        <div class="tab-pane fade in" id="config_update">
+            <h2>更新配置</h2>
+            <form class="form-horizontal" role="form" id="form_configupdate">
+                <div class="form-group">
+                    <label for="lastname" class="col-sm-2 control-label">选择服务器</label>
+                    <div class="col-sm-10">
+                        <div><button type="button" class="btn btn-default" onclick="configupdate_getservers()">得到服务器</button></div>
+                        <div class="panel panel-primary" style="width:400px;">
+                            <div class="panel-heading">
+                                <h3 class="panel-title">选择要更新的服务器</h3>
+                            </div>
+                            <div class="panel-body" id="form_configupdate_servers">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-sm-offset-2 col-sm-10">
+                        <button type="button" class="btn btn-primary" onclick="cmd_updateconfig()">确定发布</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+
+        <div class="tab-pane fade in" id="execute_cmd">
+            <h2>执行CMD</h2>
+            <form class="form-horizontal" role="form" id="form_executecmd">
+                <div class="form-group">
+                    <label for="lastname" class="col-sm-2 control-label">选择服务器</label>
+                    <div class="col-sm-10">
+                        <div><button type="button" class="btn btn-default" onclick="executecmd_getservers()">得到服务器</button></div>
+                        <div class="panel panel-primary" style="width:400px;">
+                            <div class="panel-heading">
+                                <h3 class="panel-title">选择要更新的服务器</h3>
+                            </div>
+                            <div class="panel-body" id="form_executecmd_servers">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="lastname" class="col-sm-2 control-label">命令内容</label>
+                    <div class="col-sm-offset-2 col-sm-10">
+                        <textarea name="form_executecmd_cmdline" id="form_executecmd_cmdline" rows="10" class="form-control"></textarea>
+                    </div>
+                </div>
+                @*form_executecmd_cmdline*@
+                <div class="form-group">
+                    <div class="col-sm-offset-2 col-sm-10">
+                        <button type="button" class="btn btn-primary" onclick="cmd_executecmd()">确定发布</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+    </div>
+
+</div>
+
+<!-- 模态框（Modal） -->
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                <h4 class="modal-title" id="myModalLabel">模态框（Modal）标题</h4>
+            </div>
+            <div class="modal-body" id="m_value"></div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                <button type="button" class="btn btn-primary" onclick="setselectv()">提交更改</button>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div> 

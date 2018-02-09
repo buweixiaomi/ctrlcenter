@@ -1,0 +1,36 @@
+﻿@using Webdiyer.WebControls.Mvc
+@using ManageWeb
+@model ManageDomain.Models.PageModel<ManageDomain.Models.OperationLog>
+@{
+}
+
+<table class="table table-bordered table-hover">
+    <thead>
+        <tr>
+            <th width="50px;">ID</th>
+            <th width="150px;">操作人</th>
+            <td width="150px;">标题</td>
+            <td width="80px;">模块</td>
+            <th>操作内容</th>
+            <th width="200px;">创建时间</th>
+            <th width="80px;">操作</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var a in Model.list)
+        {
+            <tr>
+                <td>@a.Id</td>
+                <td>@a.OperationName</td>
+                <td>@a.OperationTitle</td>
+                <td>@a.Module</td>
+                <td style="word-break:break-all;">@a.OperationContent</td>
+                <td>@Html.ToDateString(a.Createtime)</td>
+                <td>@Html.ActionLink("详情", "Edit", new { id = a.Id })</td>
+            </tr>
+        }
+    </tbody>
+</table>
+@Html.Pager(new Webdiyer.WebControls.Mvc.PagedList<object>(Model.list, Model.PageNo, Model.PageSize, Model.TotalCount), new PagerOptions { PageIndexParameterName = "pno", NumericPagerItemCount = 5, ContainerTagName = "ul", CssClass = "pagination", CurrentPagerItemTemplate = "<li class=\"active\"><a href=\"#\">{0}</a></li>", DisabledPagerItemTemplate = "<li class=\"disabled\"><a>{0}</a></li>", PagerItemTemplate = "<li>{0}</li>", Id = "bootstrappager2", PageIndexBoxId = "pageIndexBox", GoToButtonId = "goToBtn" })
+
+

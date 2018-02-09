@@ -1,0 +1,124 @@
+﻿@model List<Tuple<ManageDomain.Models.Manager, Dictionary<string, ManageDomain.Models.WorkDaily>>>
+@{
+    ViewBag.Title = "工作日志报表";
+    Layout = "~/Views/Shared/_LayoutPageHome.cshtml";
+
+    int? search_state = ViewBag.search_state;
+    search_state = search_state ?? 0;
+    string str_state = search_state.ToString();
+    List<ManageDomain.Models.UserTag> managertags = ViewBag.tags;
+    List<SelectListItem> gtags = new List<SelectListItem>();
+    DateTime currbegintime = ViewBag.realbegintime;
+    DateTime currendtime = ViewBag.realendtime;
+    DateTime tempend = currendtime;
+    foreach (var a in managertags)
+    {
+        gtags.Add(new SelectListItem() { Text = a.Tag, Value = a.UserTagId.ToString(), Selected = a.UserTagId.ToString() == (string)ViewBag.groupid });
+    }
+}
+@section Head{
+    <script type="text/javascript">
+        /// <reference path="/scripts/jquery-1.9.1.js" />
+        /// <reference path="/scripts/jquery-1.9.1.js" />
+        $(document).ready(function () {
+            libworkdaily.report_scroll();
+
+            //$("#report_detail").hover(null, function () {
+            //    $('#report_detail').hide();
+            //})
+            //$(".cc-report-itemcontent").hover(function () {
+            //    if ($(this).find('textarea').length == 0)
+            //        return;
+            //    $('#report_detail textarea').val($(this).find('textarea').val());
+            //    if (!$('#report_detail').visible) {
+            //        $('#report_detail').show();
+            //        $('#report_detail').css({
+            //            top: $(this).position().top + 20,
+            //            left: $(this).position().left
+            //        });
+            //    }
+            //}, function () {
+            // //   $('#report_detail').hide();
+            //});
+        });
+    </script>
+}
+
+<div class="cc-content-header">
+    <form class="form-inline" role="form">
+        <div class="form-group">
+            <label for="endtime">工作日期</label>
+            <input type="text" class="form-control" id="endtime" value="@ViewBag.endtime" name="endtime" onclick="WdatePicker({ dateFmt: 'yyyy-MM-dd' })" placeholder="结束日期" />
+            <input type="text" class="form-control" id="begintime" value="@ViewBag.begintime" name="begintime" onclick="WdatePicker({ dateFmt: 'yyyy-MM-dd' })" placeholder="开始日期" />
+        </div>
+        <div class="form-group">
+            <label for="groupid">分组标签</label>
+            @Html.DropDownList("groupid", gtags, new { @class = "form-control cc-width-2" })
+        </div>
+        <button type="submit" class="btn btn-default">查询</button>
+    </form>
+</div>
+
+
+<div class="cc-workdaily-report" style="">
+    @*<div class="cc-vitual-tableheader-con">
+            <div class="cc-display-float-left cc-vitual-tableheader" style="width:150px;"> </div>
+            @foreach (var a in Model)
+            {
+                <div class="cc-display-float-left cc-vitual-tableheader" style="width:250px; text-align:center;">
+                    @a.Item1.Name
+                </div>
+            }
+        </div>*@
+    <table class="table table-bordered tbreport-main" style="width:@(150+Model.Count*250)px;">
+        <tbody>
+            <tr class="report-top-head">
+                <th class="cc-report-border-none" width="150px" height="0" style="background-color:white;"></th>
+                @foreach (var a in Model)
+                {
+                    <th width="250px" height="50px" style="text-align:center; vertical-align:middle;">@a.Item1.Name</th>
+                }
+            </tr>
+            @{tempend = currendtime;}
+            @for (; tempend >= currbegintime; tempend = tempend.AddDays(-1))
+            {
+                <tr>
+                    <th height="200px" class="cc-workdaily-report-time" width="150px">@tempend.ToString("yyyy-MM-dd")<br /> @tempend.ToString("dddd")</th>
+                    @foreach (var a in Model)
+                    {
+                        <td width="250px">
+                            <div class="cc-report-itemcontent">
+                                @if (a.Item2.ContainsKey(tempend.ToString("yyyy-MM-dd")))
+                                {
+
+                                    <p class="text-right" style="float:right;"><a target="_blank" class="btn-link" href="/workdaily/edit?workdailyid=@a.Item2[tempend.ToString("yyyy-MM-dd")].WorkDailyId">@*<span class="glyphicon glyphicon-th-large"></span>*@详情</a></p>
+                                    <textarea disabled style="width:220px; height:150px;">@a.Item2[tempend.ToString("yyyy-MM-dd")].Content</textarea>
+                                }
+                                else
+                                {
+                                    <span></span>
+                                }
+                            </div>
+                        </td>
+                    }
+                </tr>
+            }
+            <tr id="hasmore_tr">
+                <th class="cc-report-border-none"></th>
+                <th colspan="@((int)((currendtime-currbegintime).TotalDays))">
+                    @if (ViewBag.hasmore)
+                    {
+                        <button class="btn btn-primary" style="height:80px; width:100%; padding:5px;" data-begintime="@ViewBag.nextbegintime" onclick="libworkdaily.report_hasmore(this)" data-endtime="@ViewBag.nextendtime" data-groupid="@ViewBag.groupid">查看更多</button>
+
+                    }
+                </th>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<div id="report_detail" style="display:inline-block; position:fixed; display:none;  ">
+    <textarea disabled rows="12" cols="60" style="border-radius:5px; border:1px solid #0094ff;padding:5px; color:white; background-color:#4d4646; resize:none;"></textarea>
+    <span class="cc-display-inline-block" style="width:50px; height:50px; float:right; ">关闭</span>
+</div>
+

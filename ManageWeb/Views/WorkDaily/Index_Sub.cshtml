@@ -1,0 +1,39 @@
+﻿@using Webdiyer.WebControls.Mvc
+@using ManageWeb
+@model ManageDomain.Models.PageModel<ManageDomain.Models.WorkDaily>
+@{
+}
+
+<table class="table table-bordered table-hover">
+    <thead>
+        <tr>
+            <th width="50px;">ID</th>
+            <th>人员</th>
+            <th width="200px">创建时间</th>
+            <th width="200px">工作日期</th>
+            <th>内容</th>
+            <th>操作</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var a in Model.list)
+        {
+            <tr>
+                <td>@a.WorkDailyId</td>
+                <td>@a.ManagerId @a.ManagerName</td>
+                <td>@Html.ToDateString(a.CreateTime)</td>
+                <td>@Html.ToDateString(a.WorkTime, "date")</td>
+                <td style="max-width:400px;">@(a.Content.Length > 200 ? a.Content.Substring(0, 200)+"..." : a.Content)</td>
+                <td>
+                    <div class="btn-group btn-group-sm">
+                        @Html.ActionLink("详情", "Edit", new { workdailyid = a.WorkDailyId }, new { @class = "btn btn-default" })
+                        <button class="btn btn-danger" data-id="@a.WorkDailyId" onclick="libworkdaily.index_delete(this)">删除</button>
+                    </div>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+@Html.Pager(new Webdiyer.WebControls.Mvc.PagedList<object>(Model.list, Model.PageNo, Model.PageSize, Model.TotalCount), new PagerOptions { PageIndexParameterName = "pno", NumericPagerItemCount = 5, ContainerTagName = "ul", CssClass = "pagination", CurrentPagerItemTemplate = "<li class=\"active\"><a href=\"#\">{0}</a></li>", DisabledPagerItemTemplate = "<li class=\"disabled\"><a>{0}</a></li>", PagerItemTemplate = "<li>{0}</li>", Id = "bootstrappager2", PageIndexBoxId = "pageIndexBox", GoToButtonId = "goToBtn" })
+
+

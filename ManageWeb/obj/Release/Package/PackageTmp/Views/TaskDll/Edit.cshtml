@@ -1,0 +1,167 @@
+﻿@using ManageDomain
+@using ManageWeb
+@model ManageDomain.Models.Task
+@{
+    ViewBag.Title = (Model == null) ? "新增任务" : "修改任务-[" + Model.TaskId + " " + Model.Title + "]";
+    Layout = "~/Views/Shared/_LayoutPageHome.cshtml";
+    var model = Model == null ? new ManageDomain.Models.Task() : Model;
+}
+@section Head{
+    <script type="text/javascript">
+        //更新配置
+        function configupdate_getservers() {
+            libjs.getservers("#form_configupdate_servers");
+        }
+    </script>
+}
+
+<h2>编辑项目信息</h2>
+<p>@Html.ActionLink("返回", "Index", null, new { @class = "btn btn-success" })</p>
+@if (model.TaskId > 0)
+{
+    <div class="btn-group">
+        @Html.ActionLink("编辑", "Edit", new { TaskId = Request.QueryString["TaskId"] }, new { @class = "btn btn-default active" })
+        @Html.ActionLink("版本", "Version", new { TaskId = Request.QueryString["TaskId"] }, new { @class = "btn btn-default" })
+    </div>
+}
+<div>
+    <form class="form-horizontal" role="form" method="post">
+        <div class="form-group">
+            <label for="projectId" class="col-sm-2 control-label">任务ID</label>
+            <div class="col-sm-10">
+                @if (model.TaskId <= 0)
+                {
+                    <input type="text" class="form-control cc-width-4" name="TaskId" id="TaskId" placeholder="自动生成" readonly="readonly" value=""> }
+                else
+                {
+                    <input type="text" class="form-control cc-width-4" name="TaskId" id="TaskId" readonly="readonly" value="@(model.TaskId)">
+                }
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="title" class="col-sm-2 control-label">任务名称</label>
+            <div class="col-sm-10">
+                <input type="text" class="form-control cc-width-4" id="title" name="title" placeholder="请输入任务名称" value="@(model.Title)">
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="codeName" class="col-sm-2 control-label">任务代码</label>
+            <div class="col-sm-10">
+                <input type="text" class="form-control cc-width-4" id="codeName" name="codeName" placeholder="请输入任务代码" value="@(model.CodeName)">
+                <span class="help-block">请尽量只使用字线和下划线</span>
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="codeName" class="col-sm-2 control-label">任务配置</label>
+            <div class="col-sm-10">
+                <textarea class="form-control cc-width-8" rows="10" id="TaskConfig" name="TaskConfig">@(model.TaskConfig)</textarea>
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="codeName" class="col-sm-2 control-label">服务器ID</label>
+            <div class="col-sm-10">
+                <input type="hidden" name="ServerId" id="ServerId" value="@(model.ServerID)" />
+                @if (model.TaskId > 0)
+                {
+                    <button type="button" onclick="libserverproject.edit_selectserver()" class="btn btn-primary">选择服务器</button>
+                    <span id="show_serverid" class="text-success">【@(model.ServerID)-@(ViewBag.servername)】</span>
+                }
+                else
+                {
+                    <button type="button" class="btn btn-primary btn-sm" onclick="libserverproject.edit_selectserver()">选择服务器</button>
+                    <span id="show_serverid" class="text-success">请选择</span>
+                }
+            </div>
+        </div>
+        @if(model.TaskId>0)
+        { 
+        <div class="form-group">
+            <label for="State" class="col-sm-2 control-label">任务状态</label>
+            <div class="col-sm-10">
+                @Html.DropDownList("State", new List<SelectListItem>() {
+           new SelectListItem(){ Text = "正常" ,Value ="0", Selected = model.State==0},
+           new SelectListItem(){ Text = "停用" ,Value ="1", Selected = model.State==1}
+                    }, new { @class = "form-control  cc-width-3", disabled="disabled" })
+            </div>
+            @*new SelectListItem(){ Text = "删除" ,Value ="-1", Selected = model.State==-1}*@
+        </div>
+        }
+        <div class="form-group">
+            <label for="title" class="col-sm-2 control-label">类名</label>
+            <div class="col-sm-10">
+                <input type="text" class="form-control cc-width-4" id="ClassFullName" name="ClassFullName" placeholder="请输入类名" value="@(model.ClassFullName)">
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="title" class="col-sm-2 control-label">运行方案(cron)</label>
+            <div class="col-sm-10">
+                <input type="text" class="form-control cc-width-4" id="RunCron" name="RunCron" placeholder="请输入运行方案" value="@(model.RunCron)">
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="title" class="col-sm-2 control-label">入口DLL</label>
+            <div class="col-sm-10">
+                <input type="text" class="form-control cc-width-4" id="Dll" name="Dll" placeholder="请输入入口DLL" value="@(model.Dll)">
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="Remark" class="col-sm-2 control-label">备注</label>
+            <div class="col-sm-10">
+                <textarea class="form-control cc-width-4" rows="3" id="Remark" name="Remark">@(model.Remark)</textarea>
+            </div>
+        </div>
+        @if (model.TaskId > 0)
+        {
+            <div class="form-group">
+                <label for="serverName" class="col-sm-2 control-label">创建时间</label>
+                <div class="col-sm-10">
+                    <span class="help-block">@Html.ToDateString(model.CreateTime)</span>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="serverName" class="col-sm-2 control-label">更新时间</label>
+                <div class="col-sm-10">
+                    <span class="help-block">@Html.ToDateString(model.UpdateTime)</span>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="serverName" class="col-sm-2 control-label">在服务器当前状态</label>
+                <div class="col-sm-10">
+                    <span class="help-block">@(model.SeverState == 0 ? "停止" : "运行")</span>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="serverName" class="col-sm-2 control-label">占内存量</label>
+                <div class="col-sm-10">
+                    <span class="help-block">@(model.Memory)</span>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="serverName" class="col-sm-2 control-label">上一次运行时间</label>
+                <div class="col-sm-10">
+                    <span class="help-block">@Html.ToDateString(model.LastTime)</span>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="serverName" class="col-sm-2 control-label">当前版本号</label>
+                <div class="col-sm-10">
+                    <span class="help-block">@(model.CurrVersionID)</span>
+                </div>
+            </div>
+        }
+        <div class="form-group">
+            <div class="col-sm-offset-2 col-sm-10">
+                @if (model.TaskId <= 0)
+                {
+                    <button type="submit" class="btn btn-primary">新增</button>}
+                else
+                {
+                    <button type="submit" class="btn btn-primary">保存</button>
+                }
+
+                <span class="label label-info">@ViewBag.msg</span>
+            </div>
+        </div>
+    </form>
+</div>
